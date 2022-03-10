@@ -10,7 +10,7 @@ int main()
 		num[i]=n%10;
 		i++;
 		n/=10;
-	}while(n/10!=0);
+	}while(n!=0);
 	int j;
 	for(j=0;j<i;j++)
 	{
