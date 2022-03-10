@@ -1,10 +1,10 @@
 #!/bin/bash
-touch hello_os.c
-sed -n '8p' file >> hello_os.c
-sed -n '32p' file >> hello_os.c
-sed -n '128p' file >> hello_os.c
-sed -n '512p' file >> hello_os.c
-sed -n '1024p' file >> hello_os.c
+touch $2
+sed -n '8p' $1 >> $2
+sed -n '32p' $1 >> $2
+sed -n '128p' $1 >> $2
+sed -n '512p' $1 >> $2
+sed -n '1024p' $1 >> $2
 
 
 
