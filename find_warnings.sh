@@ -1,5 +1,7 @@
 #!bin/bash
-gcc -Wall $1 -o test 2> warning.txt | sed 's/warning: //g' >> result.txt
+gcc -Wall $1 -o test 2> warning.txt 
+grep warning: warning.txt | sed -n 's/warning: //g' >> result.txt
+gcc -Wall $1 -o test 2> warning.txt
 a=1
 if [ $? -eq 0 ]
 then
