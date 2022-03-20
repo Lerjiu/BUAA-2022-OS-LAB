@@ -27,7 +27,7 @@ endif
 
 
 .PHONY: all $(modules) clean
-
+.PHONY: run
 all: $(modules) vmlinux
 
 vmlinux: $(modules)
@@ -36,6 +36,9 @@ vmlinux: $(modules)
 
 $(modules): 
 	$(MAKE) --directory=$@
+
+run: vmlinux
+	 gxemul -E testmips -C R3000 -M 64 vmlinux
 
 clean: 
 	for d in $(modules);	\
