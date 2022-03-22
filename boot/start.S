@@ -36,8 +36,9 @@ LEAF(_start) /*LEAF is defined in asm.h and LEAF functions don't call other func
 	  call main func.
 	*/
 	li sp, 0x80400000
-	li t0, 0x80010000 
-	jalr t0
+	jal main
+	//li t0, 0x80010000 
+	//jalr t0
 
 loop:
 	j	loop
