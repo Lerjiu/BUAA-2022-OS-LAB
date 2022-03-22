@@ -76,8 +76,8 @@ lp_Print(void (*output)(void *, char *, int),
 		buf[buf_len++] = *fmt;
 		fmt++;
 	}
-
-	
+	buf[buf_len] = '\0';
+	OUTPUT(arg, buf, buf_len);
 	/* we found a '%' */
 	
 	/* check for long */
@@ -143,8 +143,8 @@ lp_Print(void (*output)(void *, char *, int),
 			Refer to other part (case 'b',case 'o' etc.) and func PrintNum to complete this part.
 			Think the difference between case 'd' and others. (hint: negFlag).
 		*/
-		length = PrintNum(buf, ~(num)+1, 10, negFlag, width, ladjust, apdc, 0);
-	    OUTOUT(arg, buf, lengh);
+		length = PrintNum(buf, ~(num)+1, 10, negFlag, width, ladjust, padc, 0);
+	    OUTPUT(arg, buf, length);
 		break;
 
 	 case 'o':
