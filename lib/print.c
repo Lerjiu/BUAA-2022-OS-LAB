@@ -49,14 +49,14 @@ lp_Print(void (*output)(void *, char *, int),
 
 	
 
-    int longFlag;
-    int negFlag;
-    int width;
-    int prec;
-    int ladjust;
-    char padc;
+    int longFlag = 0;
+    int negFlag = 0;
+    int width = 0;
+    int prec = 0;
+    int ladjust = 0;
+    char padc = ' ';
 
-    int length;
+    int length = 0;
 
     /*
         Exercise 1.5. Please fill in two parts in this file.
@@ -113,9 +113,8 @@ lp_Print(void (*output)(void *, char *, int),
 		
 		if((*fmt) == 'l') {
 			longFlag  = 1;
+			fmt++;
 		}
-		
-		fmt++;
 	}
 
 	negFlag = 0;
