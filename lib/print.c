@@ -77,7 +77,9 @@ lp_Print(void (*output)(void *, char *, int),
 		fmt++;
 	}
 	buf[buf_len] = '\0';
-	OUTPUT(arg, buf, buf_len);
+	if(buf_len != 0) {
+		OUTPUT(arg, buf, buf_len);
+	}
 	/* we found a '%' */
 	
 	/* check for long */
@@ -105,6 +107,7 @@ lp_Print(void (*output)(void *, char *, int),
 		
 		prec = 0;
 		if((*fmt) == '.') {
+			fmt++;
 			while (IsDigit((*fmt))) {
 				prec = prec * 10 + Ctod((*fmt));
 				fmt++;
@@ -142,7 +145,11 @@ lp_Print(void (*output)(void *, char *, int),
 			Refer to other part (case 'b',case 'o' etc.) and func PrintNum to complete this part.
 			Think the difference between case 'd' and others. (hint: negFlag).
 		*/
-		length = PrintNum(buf, ~(num)+1, 10, negFlag, width, ladjust, padc, 0);
+		if(num < 0){
+			 num = ~num + 1;
+			negFlag = 1;
+		}
+		length = PrintNum(buf, num, 10, negFlag, width, ladjust, padc, 0);
 	    OUTPUT(arg, buf, length);
 		break;
 
