@@ -4,24 +4,30 @@ testabc.o:     file format elf32-tradbigmips
 Disassembly of section .text:
 
 00000000 <main>:
-   0:	27bdffe8 	addiu	sp,sp,-24
-   4:	afbe0010 	sw	s8,16(sp)
-   8:	03a0f021 	move	s8,sp
-   c:	24020001 	li	v0,1
-  10:	afc2000c 	sw	v0,12(s8)
-  14:	24020002 	li	v0,2
-  18:	afc20008 	sw	v0,8(s8)
-  1c:	00001021 	move	v0,zero
-  20:	03c0e821 	move	sp,s8
-  24:	8fbe0010 	lw	s8,16(sp)
-  28:	27bd0018 	addiu	sp,sp,24
-  2c:	03e00008 	jr	ra
-  30:	00000000 	nop
-	...
+   0:	3c1c0000 	lui	gp,0x0
+   4:	279c0000 	addiu	gp,gp,0
+   8:	0399e021 	addu	gp,gp,t9
+   c:	27bdffe8 	addiu	sp,sp,-24
+  10:	afbe0010 	sw	s8,16(sp)
+  14:	03a0f021 	move	s8,sp
+  18:	24020001 	li	v0,1
+  1c:	afc2000c 	sw	v0,12(s8)
+  20:	24020002 	li	v0,2
+  24:	afc20008 	sw	v0,8(s8)
+  28:	8f830000 	lw	v1,0(gp)
+  2c:	2402000a 	li	v0,10
+  30:	ac620000 	sw	v0,0(v1)
+  34:	00001021 	move	v0,zero
+  38:	03c0e821 	move	sp,s8
+  3c:	8fbe0010 	lw	s8,16(sp)
+  40:	27bd0018 	addiu	sp,sp,24
+  44:	03e00008 	jr	ra
+  48:	00000000 	nop
+  4c:	00000000 	nop
 Disassembly of section .reginfo:
 
 00000000 <.reginfo>:
-   0:	e0000004 	sc	zero,4(zero)
+   0:	f200000c 	0xf200000c
 	...
 Disassembly of section .pdr:
 
