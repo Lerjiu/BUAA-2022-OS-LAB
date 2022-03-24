@@ -1,1 +1,4 @@
-int c = 3;
+int c(int num)
+{
+	return num*2;
+}

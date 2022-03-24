@@ -7,38 +7,65 @@ Disassembly of section .text:
    0:	3c1c0000 	lui	gp,0x0
    4:	279c0000 	addiu	gp,gp,0
    8:	0399e021 	addu	gp,gp,t9
-   c:	27bdffe8 	addiu	sp,sp,-24
-  10:	afbe0010 	sw	s8,16(sp)
-  14:	03a0f021 	move	s8,sp
-  18:	24020001 	li	v0,1
-  1c:	afc2000c 	sw	v0,12(s8)
-  20:	24020002 	li	v0,2
-  24:	afc20008 	sw	v0,8(s8)
-  28:	8f830000 	lw	v1,0(gp)
-  2c:	2402000a 	li	v0,10
-  30:	ac620000 	sw	v0,0(v1)
-  34:	00001021 	move	v0,zero
-  38:	03c0e821 	move	sp,s8
-  3c:	8fbe0010 	lw	s8,16(sp)
-  40:	27bd0018 	addiu	sp,sp,24
-  44:	03e00008 	jr	ra
-  48:	00000000 	nop
-  4c:	00000000 	nop
+   c:	27bdffd8 	addiu	sp,sp,-40
+  10:	afbf0024 	sw	ra,36(sp)
+  14:	afbe0020 	sw	s8,32(sp)
+  18:	03a0f021 	move	s8,sp
+  1c:	afbc0010 	sw	gp,16(sp)
+  20:	24020001 	li	v0,1
+  24:	afc20018 	sw	v0,24(s8)
+  28:	8f990000 	lw	t9,0(gp)
+  2c:	0320f809 	jalr	t9
+  30:	00000000 	nop
+  34:	8fdc0010 	lw	gp,16(s8)
+  38:	8fc40018 	lw	a0,24(s8)
+  3c:	8f990000 	lw	t9,0(gp)
+  40:	0320f809 	jalr	t9
+  44:	00000000 	nop
+  48:	8fdc0010 	lw	gp,16(s8)
+  4c:	00001021 	move	v0,zero
+  50:	03c0e821 	move	sp,s8
+  54:	8fbf0024 	lw	ra,36(sp)
+  58:	8fbe0020 	lw	s8,32(sp)
+  5c:	27bd0028 	addiu	sp,sp,40
+  60:	03e00008 	jr	ra
+  64:	00000000 	nop
+
+00000068 <b>:
+  68:	27bdffe8 	addiu	sp,sp,-24
+  6c:	afbe0010 	sw	s8,16(sp)
+  70:	03a0f021 	move	s8,sp
+  74:	24020002 	li	v0,2
+  78:	afc20008 	sw	v0,8(s8)
+  7c:	8fc20008 	lw	v0,8(s8)
+  80:	03c0e821 	move	sp,s8
+  84:	8fbe0010 	lw	s8,16(sp)
+  88:	27bd0018 	addiu	sp,sp,24
+  8c:	03e00008 	jr	ra
+  90:	00000000 	nop
+	...
 Disassembly of section .reginfo:
 
 00000000 <.reginfo>:
-   0:	f200000c 	0xf200000c
+   0:	f2000014 	0xf2000014
 	...
 Disassembly of section .pdr:
 
 00000000 <.pdr>:
    0:	00000000 	nop
-   4:	40000000 	mfc0	zero,c0_index
-   8:	fffffff8 	sdc3	$31,-8(ra)
+   4:	c0000000 	ll	zero,0(zero)
+   8:	fffffffc 	sdc3	$31,-4(ra)
 	...
-  14:	00000018 	mult	zero,zero
+  14:	00000028 	0x28
   18:	0000001e 	0x1e
   1c:	0000001f 	0x1f
+  20:	00000000 	nop
+  24:	40000000 	mfc0	zero,c0_index
+  28:	fffffff8 	sdc3	$31,-8(ra)
+	...
+  34:	00000018 	mult	zero,zero
+  38:	0000001e 	0x1e
+  3c:	0000001f 	0x1f
 Disassembly of section .comment:
 
 00000000 <.comment>:
