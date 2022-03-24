@@ -82,18 +82,20 @@ int readelf(u_char *binary, int size)
 		int i,j;
 		int overlay = 0;
 		int conflict = 0;
+		Elf32_Word min_addr;
+		Elf32_Word max_addr;
 		for(i=0;i<phnum;i++)
 		{
 			for(j=i+1;j<phnum;j++)
 			{
-				Elf32_Word min_addr = (phdr+i)->p_vaddr < (phdr+j)->p_vaddr ? (phdr+i)->p_vaddr : (phdr+j)->p_vaddr;
+				min_addr = (phdr+i)->p_vaddr < (phdr+j)->p_vaddr ? (phdr+i)->p_vaddr : (phdr+j)->p_vaddr;
 				
-				Elf32_Word max_addr = (phdr+i)->p_vaddr > (phdr+j)->p_vaddr ? (phdr+i)->p_vaddr : (phdr+j)->p_vaddr;
+				max_addr = (phdr+i)->p_vaddr > (phdr+j)->p_vaddr ? (phdr+i)->p_vaddr : (phdr+j)->p_vaddr;
 				Elf32_Word min_mem = (phdr+i)->p_vaddr < (phdr+j)->p_vaddr ? (phdr+i)->p_memsz : (phdr+j)->p_memsz;
 				if((min_addr+min_mem)/4096==max_addr/4096)
 				{
 					overlay = 1;
-					if((min_addr+min_mem>max_addr)
+					if(min_addr+min_mem>max_addr)
 					{
 						conflict = 1;
 					}
