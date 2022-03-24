@@ -106,9 +106,9 @@ int readelf(u_char *binary, int size)
 				phdr++;
 			}
 		}else if(overlay==1&&conflict==0){
-			printf("Overlay at page va : 0x%x\n",(phdr+j)->p_vaddr/4096<<12);
+		//	printf("Overlay at page va : 0x%x\n",(phdr+j)->p_vaddr/4096<<12);
 		}else if(overlay==1&&conflict==1){
-			printf("Conflict at page va : 0x%x\n",(phdr+j)->p_vaddr/4096<<12);
+		//	printf("Conflict at page va : 0x%x\n",(phdr+j)->p_vaddr/4096<<12);
 		}
 
         return 0;
