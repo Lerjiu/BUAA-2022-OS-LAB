@@ -3,22 +3,22 @@ test:     file format elf32-tradbigmips
 
 Disassembly of section .text:
 
-00010000 <b>:
-   10000:	03e00008 	jr	ra
-   10004:	24020002 	li	v0,2
+00010000 <main>:
+   10000:	27bdffe8 	addiu	sp,sp,-24
+   10004:	afbf0010 	sw	ra,16(sp)
+   10008:	0c00400b 	jal	1002c <b>
+   1000c:	00000000 	nop
+   10010:	0c004010 	jal	10040 <c>
+   10014:	24040001 	li	a0,1
+   10018:	00001021 	move	v0,zero
+   1001c:	8fbf0010 	lw	ra,16(sp)
+   10020:	00000000 	nop
+   10024:	03e00008 	jr	ra
+   10028:	27bd0018 	addiu	sp,sp,24
 
-00010008 <main>:
-   10008:	27bdffe8 	addiu	sp,sp,-24
-   1000c:	afbf0010 	sw	ra,16(sp)
-   10010:	0c004000 	jal	10000 <b>
-   10014:	00000000 	nop
-   10018:	0c004010 	jal	10040 <c>
-   1001c:	24040001 	li	a0,1
-   10020:	00001021 	move	v0,zero
-   10024:	8fbf0010 	lw	ra,16(sp)
-   10028:	00000000 	nop
+0001002c <b>:
    1002c:	03e00008 	jr	ra
-   10030:	27bd0018 	addiu	sp,sp,24
+   10030:	24020002 	li	v0,2
 	...
 
 00010040 <c>:
@@ -34,14 +34,14 @@ Disassembly of section .pdr:
 
 00000000 <.pdr>:
    0:	00010000 	sll	zero,at,0x0
+   4:	80000000 	lb	zero,0(zero)
+   8:	fffffff8 	0xfffffff8
 	...
+  14:	00000018 	mult	zero,zero
   18:	0000001d 	0x1d
   1c:	0000001f 	0x1f
-  20:	00010008 	0x10008
-  24:	80000000 	lb	zero,0(zero)
-  28:	fffffff8 	0xfffffff8
+  20:	0001002c 	0x1002c
 	...
-  34:	00000018 	mult	zero,zero
   38:	0000001d 	0x1d
   3c:	0000001f 	0x1f
   40:	00010040 	sll	zero,at,0x1

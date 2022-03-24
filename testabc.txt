@@ -3,22 +3,22 @@ testabc.o:     file format elf32-tradbigmips
 
 Disassembly of section .text:
 
-00000000 <b>:
-   0:	03e00008 	jr	ra
-   4:	24020002 	li	v0,2
+00000000 <main>:
+   0:	27bdffe8 	addiu	sp,sp,-24
+   4:	afbf0010 	sw	ra,16(sp)
+   8:	0c000000 	jal	0 <main>
+   c:	00000000 	nop
+  10:	0c000000 	jal	0 <main>
+  14:	24040001 	li	a0,1
+  18:	00001021 	move	v0,zero
+  1c:	8fbf0010 	lw	ra,16(sp)
+  20:	00000000 	nop
+  24:	03e00008 	jr	ra
+  28:	27bd0018 	addiu	sp,sp,24
 
-00000008 <main>:
-   8:	27bdffe8 	addiu	sp,sp,-24
-   c:	afbf0010 	sw	ra,16(sp)
-  10:	0c000000 	jal	0 <b>
-  14:	00000000 	nop
-  18:	0c000000 	jal	0 <b>
-  1c:	24040001 	li	a0,1
-  20:	00001021 	move	v0,zero
-  24:	8fbf0010 	lw	ra,16(sp)
-  28:	00000000 	nop
+0000002c <b>:
   2c:	03e00008 	jr	ra
-  30:	27bd0018 	addiu	sp,sp,24
+  30:	24020002 	li	v0,2
 	...
 Disassembly of section .reginfo:
 
@@ -28,14 +28,14 @@ Disassembly of section .reginfo:
 Disassembly of section .pdr:
 
 00000000 <.pdr>:
+   0:	00000000 	nop
+   4:	80000000 	lb	zero,0(zero)
+   8:	fffffff8 	0xfffffff8
 	...
+  14:	00000018 	mult	zero,zero
   18:	0000001d 	0x1d
   1c:	0000001f 	0x1f
-  20:	00000000 	nop
-  24:	80000000 	lb	zero,0(zero)
-  28:	fffffff8 	0xfffffff8
 	...
-  34:	00000018 	mult	zero,zero
   38:	0000001d 	0x1d
   3c:	0000001f 	0x1f
 Disassembly of section .comment:
