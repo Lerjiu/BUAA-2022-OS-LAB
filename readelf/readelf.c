@@ -77,9 +77,9 @@ int readelf(u_char *binary, int size)
 		//}
         // hint: section number starts at 0.
 		shdr += 2;
-		printf("Read:%d:0x%x,0x%x\n",2,shdr->sh_offset,shdr->sh_addr);
+		printf("Read : %d:0x%x,0x%x\n",2,shdr->sh_offset,shdr->sh_addr);
 		shdr += 1;
-		printf("Read:%d:0x%x,0x%x\n",3,shdr->sh_offset,shdr->sh_addr);
+		printf("Read : %d:0x%x,0x%x\n",3,shdr->sh_offset,shdr->sh_addr);
 
         return 0;
 }
