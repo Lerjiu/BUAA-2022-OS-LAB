@@ -1,0 +1,25 @@
+
+defc.o:     file format elf32-tradbigmips
+
+Disassembly of section .data:
+
+00000000 <c>:
+   0:	00000003 	sra	zero,zero,0x0
+	...
+Disassembly of section .reginfo:
+
+00000000 <.reginfo>:
+	...
+Disassembly of section .comment:
+
+00000000 <.comment>:
+   0:	00474343 	0x474343
+   4:	3a202847 	xori	zero,s1,0x2847
+   8:	4e552920 	c3	0x552920
+   c:	342e302e 	ori	t6,at,0x302e
+  10:	30202844 	andi	zero,at,0x2844
+  14:	454e5820 	0x454e5820
+  18:	454c444b 	0x454c444b
+  1c:	20342e31 	addi	s4,at,11825
+  20:	20342e30 	addi	s4,at,11824
+  24:	2e302900 	sltiu	s0,s1,10496
