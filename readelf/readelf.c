@@ -63,7 +63,7 @@ int readelf(u_char *binary, int size)
         }
 
         // get section table addr, section header number and section header size.
-		printf("e_type:%d\n",ehdr->e_type);
+		//printf("e_type:%d\n",ehdr->e_type);
 		ptr_sh_table = (u_char*)ehdr + ehdr->e_shoff;
 		Elf32_Half shnum = ehdr->e_shnum;
 		Elf32_Half shsize = ehdr->e_shentsize;
