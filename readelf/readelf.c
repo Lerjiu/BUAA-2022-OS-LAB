@@ -54,7 +54,10 @@ int readelf(u_char *binary, int size)
         u_char *ptr_sh_table = NULL;
         Elf32_Half sh_entry_count;
         Elf32_Half sh_entry_size;
-
+		
+		Elf32_Half ph_entry_num;
+		Elf32_Half ph_entry_size;
+		Elf32_Phdr *phdr = NULL;
 
         // check whether `binary` is a ELF file.
         if (size < 4 || !is_elf_format(binary)) {
@@ -64,19 +67,49 @@ int readelf(u_char *binary, int size)
 
         // get section table addr, section header number and section header size.
 		//printf("e_type:%d\n",ehdr->e_type);
-		ptr_sh_table = (u_char*)ehdr + ehdr->e_shoff;
-		Elf32_Half shnum = ehdr->e_shnum;
-		Elf32_Half shsize = ehdr->e_shentsize;
+		ptr_sh_table = (u_char*)ehdr + ehdr->e_phoff;
+		Elf32_Half phnum = ehdr->e_phnum;
+		Elf32_Half phsize = ehdr->e_phentsize;
         // for each section header, output section number and section addr. 
-		shdr = (Elf32_Shdr*)ptr_sh_table;
+		phdr = (Elf32_Phdr*)ptr_sh_table;
 
-		for(Nr=0;Nr<shnum;Nr++)
-		{
-			printf("%d:0x%x\n",Nr,shdr->sh_addr);
-			shdr += 1;
-		}
+		//for(Nr=0;Nr<shnum;Nr++)
+		//{
+		//	printf("%d:0x%x\n",Nr,shdr->sh_addr);
+		//	shdr += 1;
+		//}
         // hint: section number starts at 0.
-
+		int i,j;
+		int overlay = 0;
+		int conflict = 0;
+		for(i=0;i<phnum;i++)
+		{
+			for(j=i+1;j<phnum;j++)
+			{
+				if(((phdr+i)->p_vaddr+(phdr+i)->p_memsz)/4096 == (phdr+j)->p_vaddr/4096)
+				{
+					overlay = 1;
+					if((phdr+i)->p_vaddr+(phdr+i)->p_memsz>(phdr+j)->p_vaddr)
+					{
+						conflict = 1;
+					}
+					break;
+				}
+			}
+		}
+		
+		if(overlay==0&&conflict==0)
+		{
+			for(i=0;i<phnum;i++)
+			{
+				printf("%d:0x%x,0x%x\n",i,phdr->p_filesz,phdr->p_memsz);
+				phdr++;
+			}
+		}else if(overlay==1&&conflict==0){
+			printf("Overlay at page va : 0x%x\n",(phdr+j)->p_vaddr/4096<<12);
+		}else if(overlay==1&&conflict==1){
+			printf("Conflict at page va : 0x%x\n",(phdr+j)->p_vaddr/4096<<12);
+		}
 
         return 0;
 }
