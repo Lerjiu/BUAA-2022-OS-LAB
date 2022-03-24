@@ -89,7 +89,7 @@ int readelf(u_char *binary, int size)
 				if(((phdr+i)->p_vaddr+(phdr+i)->p_memsz)/4096 == (phdr+j)->p_vaddr/4096)
 				{
 					overlay = 1;
-					if((phdr+i)->p_vaddr+(phdr+i)->p_memsz>(phdr+j)->p_vaddr)
+					if((phdr+i)->p_vaddr+(phdr+i)->p_memsz<(phdr+j)->p_vaddr)
 					{
 						conflict = 1;
 					}
