@@ -4,32 +4,19 @@ defc.o:     file format elf32-tradbigmips
 Disassembly of section .text:
 
 00000000 <c>:
-   0:	27bdfff8 	addiu	sp,sp,-8
-   4:	afbe0000 	sw	s8,0(sp)
-   8:	03a0f021 	move	s8,sp
-   c:	afc40008 	sw	a0,8(s8)
-  10:	8fc20008 	lw	v0,8(s8)
-  14:	00021040 	sll	v0,v0,0x1
-  18:	03c0e821 	move	sp,s8
-  1c:	8fbe0000 	lw	s8,0(sp)
-  20:	27bd0008 	addiu	sp,sp,8
-  24:	03e00008 	jr	ra
-  28:	00000000 	nop
-  2c:	00000000 	nop
+   0:	03e00008 	jr	ra
+   4:	00041040 	sll	v0,a0,0x1
+	...
 Disassembly of section .reginfo:
 
 00000000 <.reginfo>:
-   0:	e0000014 	sc	zero,20(zero)
+   0:	80000014 	lb	zero,20(zero)
 	...
 Disassembly of section .pdr:
 
 00000000 <.pdr>:
-   0:	00000000 	nop
-   4:	40000000 	mfc0	zero,c0_index
-   8:	fffffff8 	sdc3	$31,-8(ra)
 	...
-  14:	00000008 	jr	zero
-  18:	0000001e 	0x1e
+  18:	0000001d 	0x1d
   1c:	0000001f 	0x1f
 Disassembly of section .comment:
 

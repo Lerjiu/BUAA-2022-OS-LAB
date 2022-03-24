@@ -1,0 +1,73 @@
+
+test:     file format elf32-tradbigmips
+
+Disassembly of section .text:
+
+00010000 <b>:
+   10000:	03e00008 	jr	ra
+   10004:	24020002 	li	v0,2
+
+00010008 <main>:
+   10008:	27bdffe8 	addiu	sp,sp,-24
+   1000c:	afbf0010 	sw	ra,16(sp)
+   10010:	0c004000 	jal	10000 <b>
+   10014:	00000000 	nop
+   10018:	0c004010 	jal	10040 <c>
+   1001c:	24040001 	li	a0,1
+   10020:	00001021 	move	v0,zero
+   10024:	8fbf0010 	lw	ra,16(sp)
+   10028:	00000000 	nop
+   1002c:	03e00008 	jr	ra
+   10030:	27bd0018 	addiu	sp,sp,24
+	...
+
+00010040 <c>:
+   10040:	03e00008 	jr	ra
+   10044:	00041040 	sll	v0,a0,0x1
+	...
+Disassembly of section .reginfo:
+
+00010050 <.reginfo>:
+   10050:	a0000014 	sb	zero,20(zero)
+	...
+Disassembly of section .pdr:
+
+00000000 <.pdr>:
+   0:	00010000 	sll	zero,at,0x0
+	...
+  18:	0000001d 	0x1d
+  1c:	0000001f 	0x1f
+  20:	00010008 	0x10008
+  24:	80000000 	lb	zero,0(zero)
+  28:	fffffff8 	0xfffffff8
+	...
+  34:	00000018 	mult	zero,zero
+  38:	0000001d 	0x1d
+  3c:	0000001f 	0x1f
+  40:	00010040 	sll	zero,at,0x1
+	...
+  58:	0000001d 	0x1d
+  5c:	0000001f 	0x1f
+Disassembly of section .comment:
+
+00000000 <.comment>:
+   0:	00474343 	0x474343
+   4:	3a202847 	xori	zero,s1,0x2847
+   8:	4e552920 	c3	0x552920
+   c:	342e302e 	ori	t6,at,0x302e
+  10:	30202844 	andi	zero,at,0x2844
+  14:	454e5820 	0x454e5820
+  18:	454c444b 	0x454c444b
+  1c:	20342e31 	addi	s4,at,11825
+  20:	20342e30 	addi	s4,at,11824
+  24:	2e302900 	sltiu	s0,s1,10496
+  28:	00474343 	0x474343
+  2c:	3a202847 	xori	zero,s1,0x2847
+  30:	4e552920 	c3	0x552920
+  34:	342e302e 	ori	t6,at,0x302e
+  38:	30202844 	andi	zero,at,0x2844
+  3c:	454e5820 	0x454e5820
+  40:	454c444b 	0x454c444b
+  44:	20342e31 	addi	s4,at,11825
+  48:	20342e30 	addi	s4,at,11824
+  4c:	2e302900 	sltiu	s0,s1,10496
