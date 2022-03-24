@@ -1,4 +1,9 @@
 extern int c(int num);
+int b(void)
+{
+    int num=2;
+    return num;
+}
 int main()
 {
 	int a;
@@ -8,8 +13,3 @@ int main()
 	return 0;
 }
 
-int b()
-{
-	int num=2;
-	return num;
-}
