@@ -86,10 +86,14 @@ int readelf(u_char *binary, int size)
 		{
 			for(j=i+1;j<phnum;j++)
 			{
-				if(((phdr+j)->p_vaddr+(phdr+j)->p_memsz)/4096 == (phdr+i)->p_vaddr/4096)
+				Elf32_Word min_addr = (phdr+i)->p_vaddr < (phdr+j)->p_vaddr ? (phdr+i)->p_vaddr : (phdr+j)->p_vaddr;
+				
+				Elf32_Word max_addr = (phdr+i)->p_vaddr > (phdr+j)->p_vaddr ? (phdr+i)->p_vaddr : (phdr+j)->p_vaddr;
+				Elf32_Word min_mem = (phdr+i)->p_vaddr < (phdr+j)->p_vaddr ? (phdr+i)->p_memsz : (phdr+j)->p_memsz;
+				if((min_addr+min_mem)/4096==max_addr/4096)
 				{
 					overlay = 1;
-					if((phdr+j)->p_vaddr+(phdr+j)->p_memsz>(phdr+i)->p_vaddr)
+					if((min_addr+min_mem>max_addr)
 					{
 						conflict = 1;
 					}
@@ -106,9 +110,9 @@ int readelf(u_char *binary, int size)
 				phdr++;
 			}
 		}else if(overlay==1&&conflict==0){
-			printf("Overlay at page va : 0x%x\n",(phdr+i)->p_vaddr>>12<<12);
+			printf("Overlay at page va : 0x%x\n",max_addr>>12<<12);
 		}else if(overlay==1&&conflict==1){
-			printf("Conflict at page va : 0x%x\n",(phdr+i)->p_vaddr>>12<<12);
+			printf("Conflict at page va : 0x%x\n",max_addr>>12<<12);
 		}
 
         return 0;
