@@ -214,9 +214,12 @@ lp_Print(void (*output)(void *, char *, int),
         length = PrintNum(buf,num,10,0,width,ladjust,padc,0);
         OUTPUT(arg,buf,length);
 		OUTPUT(arg,",",1);
-        t++;
-        
-        c =(char)(*t);
+        t = t+1;
+        //long int ch = (int)(*t);
+        //length = PrintNum(buf,ch,10,0,width,ladjust,padc,0);
+        //OUTPUT(arg,buf,length);
+        //OUTPUT(arg,",",1);
+        c = (char)(t[0]);
 		
         length = PrintChar(buf, c, width, ladjust);
         OUTPUT(arg,buf,length);
