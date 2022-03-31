@@ -12,3 +12,8 @@ LEAF(_my_getchar)
 
 
 END(_my_getchar)
+
+LEAF(_my_exit)
+	li t0, 0xb0000010
+	lb t1, 0(t0)
+END(_my_exit)
