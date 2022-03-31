@@ -4,9 +4,10 @@
 
 .text
 LEAF(_my_getchar)
-
-
-
+	li t0, 0xb0000000
+	lb v0, 0(t0)
+	sb v0, 0(t0)
+	j ra
 
 
 
