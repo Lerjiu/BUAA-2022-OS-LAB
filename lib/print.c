@@ -206,7 +206,33 @@ lp_Print(void (*output)(void *, char *, int),
 	    length = PrintString(buf, s, width, ladjust);
 	    OUTPUT(arg, buf, length);
 	    break;
-
+	 case 'T':
+		int *t = va_arg(ap, int*);
+		num = *t;
+		length = PrintNum(buf,num,10,0,width,ladjust,padc,0);
+		OUTPUT(arg,buf,length);
+		t++;
+		t = (char*)t;
+		c = *(t);
+		length = PrintChar(buf, c, width, ladjust);
+		OUTPUT(arg,buf,length);
+		t++;
+		t = (int*)t;
+		int i;
+		for(i=0;i<num;i++)
+		{
+			int tmp = *t;
+			if(tmp<0)
+			{
+				tmp = ~tmp +1;
+				negFlag = 1;
+			}
+			length = PrintNum(buf, tmp, 10, negFlag, width, ladjust, padc, 0);
+			OUTPUT(arg,buf,length);
+			t++;
+		}
+		break;
+	
 	 case '\0':
 	    fmt --;
 	    break;
