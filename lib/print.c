@@ -208,21 +208,30 @@ lp_Print(void (*output)(void *, char *, int),
 	    break;
 		
 	 case 'T':
+		OUTPUT(arg,"{",1);
         t = (int*)va_arg(ap, int*);
         num = *t;
         length = PrintNum(buf,num,10,0,width,ladjust,padc,0);
         OUTPUT(arg,buf,length);
+		OUTPUT(arg,",",1);
         t++;
-        t = (char*)t;
-        c = *(t);
+        
+        c =(char)(*t);
+		
         length = PrintChar(buf, c, width, ladjust);
         OUTPUT(arg,buf,length);
+	    OUTPUT(arg,",",1);
+		//char cs[1];
+		//cs[0]=c;
+		//OUTPUT(arg,cs,1);
+		t = (char*)t;
         t++;
         t = (int*)t;
         int i;
         for(i=0;i<num;i++)
         {
             int tmp = *t;
+			negFlag = 0;
             if(tmp<0)
             {
                 tmp = ~tmp +1;
@@ -231,7 +240,9 @@ lp_Print(void (*output)(void *, char *, int),
             length = PrintNum(buf, tmp, 10, negFlag, width, ladjust, padc, 0);
             OUTPUT(arg,buf,length);
             t++;
+			if(i<num-1) OUTPUT(arg,",",1);
         }
+		 OUTPUT(arg,"}",1);
         break;
 		
 	 case '\0':
