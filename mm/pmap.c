@@ -27,7 +27,10 @@ void mips_detect_memory()
 {
 	/* Step 1: Initialize basemem.
 	 * (When use real computer, CMOS tells us how many kilobytes there are). */
-
+	maxpa = 0x4400000;
+	npage = 2 << 14;
+	basemem = 0x4000000;
+	extmem = 0;
 	// Step 2: Calculate corresponding npage value.
 
 	printf("Physical memory: %dK available, ", (int)(maxpa / 1024));
@@ -174,16 +177,27 @@ Hint:
 Use `LIST_INSERT_HEAD` to insert something to list.*/
 void page_init(void)
 {
+	LIST_INIT(&page_free_list);
 	/* Step 1: Initialize page_free_list. */
 	/* Hint: Use macro `LIST_INIT` defined in include/queue.h. */
-
-
+	freemem = ROUND(freemem, 1<<12);
 	/* Step 2: Align `freemem` up to multiple of BY2PG. */
+	u_long free_pa = freemem << 1 >> 1;
+	struct Page *page_now = pa2page(free_pa);
 
+	while(page_now!=pages) {
+		page_now--;
+		page_now->pp_ref = 1;
+	}
 
 	/* Step 3: Mark all memory blow `freemem` as used(set `pp_ref`
 	 * filed to 1) */
-
+	page_now = pa2page(free_pa);
+	while(page2pa(page_now)<maxpa) {
+		page_now->pp_ref = 0;
+		LIST_INSERT_HEAD(&page_free_list,page_now,pp_link);
+		page_now++;
+	}
 
 	/* Step 4: Mark the other memory as free. */
 }
@@ -208,12 +222,17 @@ int page_alloc(struct Page **pp)
 	struct Page *ppage_temp;
 
 	/* Step 1: Get a page from free memory. If fail, return the error code.*/
-
+	if(LIST_EMPTY(&page_free_list)) {
+		return -E_NO_MEM;
+	}
 
 	/* Step 2: Initialize this page.
 	 * Hint: use `bzero`. */
-
-
+	ppage_temp = LIST_FIRST(&page_free_list);
+	LIST_REMOVE(ppage_temp, pp_link);
+	bzero(page2kva(ppage_temp), BY2PG);
+	*pp = ppage_temp;
+	return 0;
 }
 
 /* Exercise 2.5 */
@@ -224,7 +243,12 @@ When you free a page, just insert it to the page_free_list.*/
 void page_free(struct Page *pp)
 {
 	/* Step 1: If there's still virtual address referring to this page, do nothing. */
-
+	if(pp->pp_ref>0) {
+		return;
+	} else if(pp->pp_ref == 0) {
+		LIST_INSERT_HEAD(&page_free_list, pp, pp_link);
+		return;
+	} 
 
 	/* Step 2: If the `pp_ref` reaches 0, mark this page as free and return. */
 
