@@ -19,6 +19,55 @@ static u_long freemem;
 static struct Page_list page_free_list;	/* Free list of physical pages */
 
 
+int page_protect(struct Page *pp)
+{
+	int is_free = 0;
+	struct Page *page_in_list;
+	LIST_FOREACH(page_in_list,&page_free_list,pp_link)
+	{
+		if(pp == page_in_list)
+		{
+			is_free=1;
+			break;
+		}
+	}
+
+	if(pp->protect==0 && is_free)
+	{
+		pp->protect=1;
+		return 0;
+	} else if(pp->protect==0 && is_free==0) {
+		return -1;
+	} else {
+		return -2;
+	}
+}
+
+
+int page_status_query(struct Page *pp)
+{
+	int is_free = 0;
+    struct Page *page_in_list; 
+    LIST_FOREACH(page_in_list, &page_free_list, pp_link)
+    {
+        if(pp == page_in_list)
+        {
+            is_free=1;
+            break;
+        }
+    }
+
+	if(pp->protect==1)
+	{
+		return 3;
+	} else if(is_free) {
+		return 2;
+	} else {
+		return 1;
+	}
+}
+
+
 /* Exercise 2.1 */
 /* Overview:
    Initialize basemem and npage.
@@ -235,14 +284,30 @@ int page_alloc(struct Page **pp)
 	if(LIST_EMPTY(&page_free_list)) {
 		return -E_NO_MEM;
 	}
-
+	
+	int all_protect = 1;
+    struct Page *page_in_list;
+    LIST_FOREACH(page_in_list, &page_free_list, pp_link)
+    {
+        if(page_in_list->protect==0)
+        {
+            all_protect=0;
+			ppage_temp = page_in_list;
+			LIST_REMOVE(ppage_temp, pp_link);
+			bzero((void*)page2kva(ppage_temp), BY2PG);
+   			*pp = ppage_temp;
+            break;
+        }
+    }
+	if(all_protect) return -E_NO_MEM;
+	else return 0;
 	/* Step 2: Initialize this page.
 	 * Hint: use `bzero`. */
-	ppage_temp = LIST_FIRST(&page_free_list);
-	LIST_REMOVE(ppage_temp, pp_link);
-	bzero((void*)page2kva(ppage_temp), BY2PG);
-	*pp = ppage_temp;
-	return 0;
+//	ppage_temp = LIST_FIRST(&page_free_list);
+//	LIST_REMOVE(ppage_temp, pp_link);
+//	bzero((void*)page2kva(ppage_temp), BY2PG);
+//	*pp = ppage_temp;
+//	return 0;
 }
 
 /* Exercise 2.5 */

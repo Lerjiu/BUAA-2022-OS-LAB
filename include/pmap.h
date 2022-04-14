@@ -19,9 +19,14 @@ struct Page {
 	// do not have valid reference count fields.
 
 	u_short pp_ref;
+	int protect;
 };
 
 extern struct Page *pages;
+
+int page_protect(struct Page *pp);
+int page_status_query(struct Page *pp);
+
 
 static inline u_long
 page2ppn(struct Page *pp)
