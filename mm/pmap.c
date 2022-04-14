@@ -19,6 +19,151 @@ static u_long freemem;
 static struct Page_list page_free_list;	/* Free list of physical pages */
 
 
+struct Area{
+	u_long start;
+	u_long size;
+	int parent;
+	int num;
+	int valid;
+	int alloced;
+};
+
+static u_long buddy_start=0x2000000;
+static u_long buddy_end=0x4000000;
+static int area_num=8;
+static struct Area areas[16384];
+static int ocupy_num=8;
+static int parent_num=8;
+
+void buddy_init(void)
+{
+	u_long size=1<<22;
+	int i;
+	areas[0].start=buddy_start;
+	areas[0].size=size;
+	areas[0].parent=0;
+	areas[0].num=1;
+	areas[0].valid=1;
+	areas[0].alloced=0;
+	for(i=1;i<8;i++)
+	{
+		areas[i].start=areas[i-1].start+areas[i-1].size;
+		areas[i].size=size;
+		areas[i].parent=0;
+    	areas[i].num=i+1;
+    	areas[i].valid=1;
+		areas[i].alloced=0;
+	}
+}
+
+int buddy_alloc(u_int size, u_int *pa, u_char *pi)
+{
+	int check_num=0;
+	int i;
+	int min_index=-1;
+	u_long min_pa = buddy_end;
+	for(i=0;check_num<area_num;i++)
+	{
+		if(areas[i].valid && !areas[i].alloced && areas[i].size>=size)
+		{
+			if(areas[i].start<min_pa)
+			{
+				min_pa=areas[i].start;
+				min_index=i;
+			}
+		}
+		if(areas[i].valid) check_num++;
+	}
+
+	if(min_index==-1) return -1;
+	
+	if(areas[min_index].size/2 < size || areas[min_index].size==1<<12)
+	{
+		areas[min_index].alloced=1;
+		return 0;
+	}
+	
+	int cnt=1;
+	u_long target=areas[min_index].size;
+	while(target>(1<<12) && target/2>=size)
+	{
+		target/=2;
+		cnt++;
+	}
+	parent_num+=(cnt-1)*2;
+	areas[min_index].valid=0;
+	areas[ocupy_num].start=areas[min_index].start;
+	areas[ocupy_num].size=target;
+	areas[ocupy_num].valid=1;
+	areas[ocupy_num].alloced=1;
+	areas[ocupy_num].num=parent_num-1;
+	if(cnt==2) areas[ocupy_num].parent=areas[min_index].num;
+	else areas[ocupy_num].parent=parent_num-2;
+	areas[ocupy_num+1].num=parent_num;
+	
+
+	int tmp=target;
+	int ret=1;
+	while(tmp>(1<<12))
+	{
+		tmp/=2;
+		ret*=2;
+	}
+	for(i=1;i<cnt;i++)
+	{
+		if(i!=1) areas[ocupy_num+i].num=areas[ocupy_num+i-1].num-2;
+		areas[ocupy_num+i].parent=areas[ocupy_num+i].num-3;
+		areas[ocupy_num+i].start=areas[ocupy_num+i-1].start+areas[ocupy_num+i-1].size;
+		areas[ocupy_num+i].size=target;
+		target*=2;
+		areas[ocupy_num+i].valid=1;
+		areas[ocupy_num+i].alloced=0;
+	}
+	areas[ocupy_num+cnt-1].parent=areas[min_index].num;
+	ocupy_num+=cnt;
+	area_num+=(cnt-1);
+	*pa=areas[min_index].start;
+	*pi=ret;
+	return 0;
+}
+
+
+void buddy_free(u_int pa)
+{
+	int i;
+	int check_num=0;
+	for(i=0;check_num<area_num;i++)
+	{
+		if(areas[i].valid && areas[i].start==pa)
+		{
+			areas[i].alloced=0;
+		}
+		if(areas[i].valid) check_num++;
+	}
+
+	int merge=0;
+	do
+	{
+		merge=0;
+		int i,j;
+		for(i=0;i<ocupy_num;i++)
+		{
+			for(j=1;j<ocupy_num;j++)
+			{
+				if(areas[i].valid && areas[j].valid && !areas[i].alloced && !areas[j].alloced && areas[i].parent==areas[j].parent && areas[i].parent!=0) {
+					merge=1;
+					areas[ocupy_num].start=(areas[i].start<areas[j].start ? areas[i].start : areas[j].start);
+					areas[ocupy_num].size=areas[i].size*2;
+					areas[ocupy_num].valid=1;
+					areas[ocupy_num].alloced=0;
+					areas[ocupy_num].num=areas[i].parent;
+				}
+			}
+		}
+		
+	}while(merge);
+}
+
 /* Exercise 2.1 */
 /* Overview:
    Initialize basemem and npage.
