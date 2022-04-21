@@ -28,7 +28,7 @@ int inverted_page_lookup(Pde *pgdir, struct Page *pp, int vpn_buffer[])
 //	u_int base = (u_int)pgdir + ((u_int)pgdir >> 10);
  	int cnt = 0;
 	int i,j;
-	for(i=0; i<128; i++)
+	for(i=0; i<1; i++)
 	{
 		pgdir_entry = (Pte*)pgdir + i;
 		if((*pgdir_entry) & PTE_V == 0)
