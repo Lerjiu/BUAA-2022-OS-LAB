@@ -37,7 +37,7 @@ int inverted_page_lookup(Pde *pgdir, struct Page *pp, int vpn_buffer[])
 		ppage = pa2page(*pgdir_entry);
 		if(ppage == pp)
 		{
-			vpn_buffer[cnt++] = ((((u_int)pgdir) >> 12) + i);
+		//	vpn_buffer[cnt++] = ((((u_int)pgdir) >> 12) + i);
 		}
 
 		pgtab = KADDR(PTE_ADDR(*pgdir_entry));
@@ -69,6 +69,7 @@ int inverted_page_lookup(Pde *pgdir, struct Page *pp, int vpn_buffer[])
 			}
 		}
 	}
+
 	return cnt;
 }
 
