@@ -23,6 +23,10 @@ struct Page {
 
 extern struct Page *pages;
 
+
+struct Page* page_migrate(Pde *pgdir, struct Page *pp);
+
+
 static inline u_long
 page2ppn(struct Page *pp)
 {

@@ -10,14 +10,16 @@ u_long maxpa;            /* Maximum physical address */
 u_long npage;            /* Amount of memory(in pages) */
 u_long basemem;          /* Amount of base memory(in bytes) */
 u_long extmem;           /* Amount of extended memory(in bytes) */
+u_long max_slow_pa = 0x3000000;
+int delimiter = 12287;
 
 Pde *boot_pgdir;
 
 struct Page *pages;
 static u_long freemem;
 
-static struct Page_list page_free_list;	/* Free list of physical pages */
-
+struct Page_list page_free_list;	/* Free list of physical pages */
+struct Page_list fast_page_free_list;
 
 /* Exercise 2.1 */
 /* Overview:
@@ -188,6 +190,7 @@ Use `LIST_INSERT_HEAD` to insert something to list.*/
 void page_init(void)
 {
 	LIST_INIT(&page_free_list);
+	LIST_INIT(&fast_page_free_list);
 	/* Step 1: Initialize page_free_list. */
 	/* Hint: Use macro `LIST_INIT` defined in include/queue.h. */
 	freemem = ROUND(freemem, 1<<12);
@@ -203,9 +206,15 @@ void page_init(void)
 	/* Step 3: Mark all memory blow `freemem` as used(set `pp_ref`
 	 * filed to 1) */
 	page_now = pa2page(free_pa);
-	while(page2pa(page_now)<maxpa) {
+	while(page2pa(page_now)<max_slow_pa) {
 		page_now->pp_ref = 0;
 		LIST_INSERT_HEAD(&page_free_list,page_now,pp_link);
+		page_now++;
+	}
+	
+	while(page2pa(page_now)<maxpa) {
+		page_now->pp_ref = 0;
+		LIST_INSERT_HEAD(&fast_page_free_list,page_now,pp_link);
 		page_now++;
 	}
 
@@ -256,7 +265,10 @@ void page_free(struct Page *pp)
 	if(pp->pp_ref>0) {
 		return;
 	} else if(pp->pp_ref == 0) {
-		LIST_INSERT_HEAD(&page_free_list, pp, pp_link);
+		if(pp - pages <= delimiter)
+			LIST_INSERT_HEAD(&page_free_list, pp, pp_link);
+		else
+			LIST_INSERT_HEAD(&fast_page_free_list, pp, pp_link);
 		return;
 	} 
 
