@@ -28,24 +28,24 @@ int inverted_page_lookup(Pde *pgdir, struct Page *pp, int vpn_buffer[])
 //	u_int base = (u_int)pgdir + ((u_int)pgdir >> 10);
  	int cnt = 0;
 	int i,j;
-	for(i=0; i<1; i++)
+	for(i=0; i<1024; i++)
 	{
 		pgdir_entry = (Pte*)pgdir + i;
-		if((*pgdir_entry) & PTE_V == 0)
+		if(((*pgdir_entry) & PTE_V) == 0)
 			continue;
 
 		ppage = pa2page(*pgdir_entry);
 		if(ppage == pp)
 		{
-		//	vpn_buffer[cnt++] = ((((u_int)pgdir) >> 12) + i);
+			vpn_buffer[cnt++] = ((((u_int)pgdir) >> 12) + i);
 		}
 
-		pgtab = KADDR(PTE_ADDR(*pgdir_entry));
+		pgtab =(Pte*)(KADDR(PTE_ADDR(*pgdir_entry)));
 		
 		for(j=0; j<1024; j++)
 		{
 			pgtab_entry = pgtab + j;
-			if((*pgtab_entry) & PTE_V == 0)
+			if(((*pgtab_entry) & PTE_V) == 0)
 				continue;
 			
 			ppage = pa2page(*pgtab_entry);
