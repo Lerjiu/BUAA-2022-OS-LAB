@@ -21,6 +21,97 @@ static u_long freemem;
 struct Page_list page_free_list;	/* Free list of physical pages */
 struct Page_list fast_page_free_list;
 
+
+int inverted_page_lookup(Pde *pgdir, struct Page *pp, int vpn_buffer[])
+{
+    Pte * pgdir_entry;
+    Pte *pgtab;
+    Pte *pgtab_entry;
+    struct Page *ppage;
+//  u_int base = (u_int)pgdir + ((u_int)pgdir >> 10);
+    int cnt = 0;
+    int i,j;
+    for(i=0; i<1024; i++)
+    {
+        pgdir_entry = (Pte*)pgdir + i;
+        if(((*pgdir_entry) & PTE_V) == 0)
+            continue;
+
+        ppage = pa2page(*pgdir_entry);
+        if(ppage == pp)
+        {
+            vpn_buffer[cnt++] = ((((u_int)pgdir) >> 12) + i);
+        }
+
+        pgtab =(Pte*)(KADDR(PTE_ADDR(*pgdir_entry)));
+
+        for(j=0; j<1024; j++)
+        {
+            pgtab_entry = pgtab + j;
+            if(((*pgtab_entry) & PTE_V) == 0)
+                continue;
+
+            ppage = pa2page(*pgtab_entry);
+            if(ppage == pp)
+            {
+                vpn_buffer[cnt++] = ((i << 10) + j);
+            //  printf("i=%d j=%d\n",i,j);
+            }
+        }
+    }    
+    for(i=0; i<cnt; i++)
+    {
+        for(j=i+1; j<cnt; j++)
+        {
+            if(vpn_buffer[i] > vpn_buffer[j])
+            {
+                int tmp = vpn_buffer[i];
+                vpn_buffer[i] = vpn_buffer[j];
+                vpn_buffer[j] = tmp;
+            }
+        }
+    }
+
+    return cnt;
+}
+
+
+struct Page* page_migrate(Pde *pgdir, struct Page *pp)
+{
+	struct Page *tp;
+	if(pp - pages <= delimiter)
+	{
+		fast_page_alloc(&tp);
+	}else{
+		page_alloc(&tp);
+	}
+	int i;
+	u_int *pcontent = page2kva(pp);
+	u_int *tcontent = page2kva(tp);
+	for(i=0; i<1024; i++)
+	{
+		*(tcontent + i) = *(pcontent + i);
+	}
+	int vpn[1024];
+	int cnt;
+	cnt = inverted_page_lookup(pgdir, pp, vpn);
+	if(cnt == 0)
+	{
+		page_free(pp);
+	}else{
+		Pte * pgtab_entry;
+		u_long va;
+		for(i=0; i<cnt; i++)
+		{
+			va = (((u_long)vpn[i]) << 12);
+			page_lookup(pgdir, va, &pgtab_entry);
+			u_int perm = (*pgtab_entry) & 0xfff;
+			page_insert(pgdir, tp, va, perm);
+		}
+	}
+	return tp;
+}
+
 /* Exercise 2.1 */
 /* Overview:
    Initialize basemem and npage.
@@ -252,6 +343,24 @@ int page_alloc(struct Page **pp)
 	bzero((void*)page2kva(ppage_temp), BY2PG);
 	*pp = ppage_temp;
 	return 0;
+}
+
+int fast_page_alloc(struct Page **pp)
+{
+    struct Page *ppage_temp;
+
+    /* Step 1: Get a page from free memory. If fail, return the error code.*/
+    if(LIST_EMPTY(&fast_page_free_list)) {
+        return -E_NO_MEM;
+    }
+
+    /* Step 2: Initialize this page.
+     * Hint: use `bzero`. */
+    ppage_temp = LIST_FIRST(&fast_page_free_list);
+    LIST_REMOVE(ppage_temp, pp_link);
+    bzero((void*)page2kva(ppage_temp), BY2PG);
+    *pp = ppage_temp;
+    return 0;
 }
 
 /* Exercise 2.5 */
