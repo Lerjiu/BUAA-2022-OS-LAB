@@ -23,6 +23,8 @@ struct Page {
 
 extern struct Page *pages;
 
+int inverted_page_lookup(Pde *pgdir, struct Page *pp, int vpn_buffer[]);
+
 static inline u_long
 page2ppn(struct Page *pp)
 {

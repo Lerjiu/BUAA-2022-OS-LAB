@@ -19,6 +19,59 @@ static u_long freemem;
 static struct Page_list page_free_list;	/* Free list of physical pages */
 
 
+int inverted_page_lookup(Pde *pgdir, struct Page *pp, int vpn_buffer[])
+{
+	Pte * pgdir_entry;
+	Pte *pgtab;
+	Pte *pgtab_entry;
+	struct Page *ppage;
+	u_int base = (u_int)pgdir + ((u_int)pgdir >> 10);
+ 	int cnt = 0;
+	int i,j;
+	for(i=0; i<1024; i++)
+	{
+		pgdir_entry = (Pte*)pgdir + i;
+		if((*pgdir_entry) & PTE_V == 0)
+			continue;
+
+		ppage = pa2page(*pgdir_entry);
+		if(ppage == pp)
+		{
+			vpn_buffer[cnt++] = (u_int)pgdir >> 12 + i;
+		}
+
+		pgtab = KADDR(PTE_ADDR(*pgdir_entry));
+		
+		for(j=0; j<1024; j++)
+		{
+			pgtab_entry = pgtab + j;
+			if((*pgtab_entry) & PTE_V == 0)
+				continue;
+			
+			ppage = pa2page(*pgtab_entry);
+			if(ppage == pp)
+			{
+				vpn_buffer[cnt++] = ((i << 10) + j);
+			//	printf("i=%d j=%d\n",i,j);
+			}
+		}
+	}
+
+	for(i=0; i<cnt; i++)
+	{
+		for(j=i+1; j<cnt; j++)
+		{
+			if(vpn_buffer[i] > vpn_buffer[j])
+			{
+				int tmp = vpn_buffer[i];
+				vpn_buffer[i] = vpn_buffer[j];
+				vpn_buffer[j] = tmp;
+			}
+		}
+	}
+	return cnt;
+}
+
 /* Exercise 2.1 */
 /* Overview:
    Initialize basemem and npage.
