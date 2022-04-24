@@ -205,9 +205,11 @@ void page_init(void)
 	page_now = pa2page(free_pa);
 	while(page2pa(page_now)<maxpa) {
 		page_now->pp_ref = 0;
-		LIST_INSERT_HEAD(&page_free_list,page_now,pp_link);
+		if(page2kva(page_now) != TIMESTACK - BY2PG)
+			LIST_INSERT_HEAD(&page_free_list,page_now,pp_link);
 		page_now++;
 	}
+
 
 	/* Step 4: Mark the other memory as free. */
 }
