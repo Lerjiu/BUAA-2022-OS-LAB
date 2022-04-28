@@ -529,6 +529,7 @@ int P(struct Env *e, int s)
     {
         ss[s-1].num--;
         e->env_wait[s-1] = 0;
+		
         e->env_s[s-1] = 1;
     }else{
         e->env_wait[s-1] = 1;
@@ -560,21 +561,24 @@ int V(struct Env *e, int s)
 
 int get_status(struct Env *e)
 {
-    struct Env *i;
-    LIST_FOREACH(i, &(ss[0].wait_list), env_link)
-    {
-        if(i == e)
-        {
-            return 1;
-        }
-    }
-    LIST_FOREACH(i, &(ss[1].wait_list), env_link)
-    {
-        if(i == e)
-        {
-            return 1;
-        }
-    }
+    if(e->env_wait[0] || e->env_wait[1])
+	{
+		return 1;
+	}
+   // LIST_FOREACH(i, &(ss[0].wait_list), env_link)
+   // {
+   //     if(i == e)
+   //     {
+   //         return 1;
+   //     }
+   // }
+   // LIST_FOREACH(i, &(ss[1].wait_list), env_link)
+   // {
+   //     if(i == e)
+   //     {
+   //         return 1;
+   //     }
+   // }
     
     if(e->env_s[0] || e->env_s[1])
     {
