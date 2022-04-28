@@ -20,6 +20,12 @@ extern char *KERNEL_SP;
 
 static u_int asid_bitmap[2] = {0}; // 64
 
+struct Signal{
+    int num;
+    struct Env_list wait_list;
+};
+//env_wait[2] env_s
+struct Signal ss[2];
 
 /* Overview:
  *  This function is to allocate an unused ASID
@@ -505,6 +511,88 @@ env_run(struct Env *e)
      */
 	env_pop_tf(&curenv->env_tf, GET_ENV_ASID(curenv->env_id));
 }
+
+
+void S_init(int s, int num)
+{
+    ss[s-1].num = num;
+    LIST_INIT(&(ss[s-1].wait_list));
+}
+
+int P(struct Env *e, int s)
+{
+    if(e->env_wait[0] || e->env_wait[1])
+    {
+        return -1;
+    }
+    if(ss[s-1].num > 0)
+    {
+        ss[s-1].num--;
+        e->env_wait[s-1] = 0;
+        e->env_s[s-1] = 1;
+    }else{
+        e->env_wait[s-1] = 1;
+        LIST_INSERT_TAIL(&(ss[s-1].wait_list), e, env_link);
+    }
+    return 0;
+}
+
+int V(struct Env *e, int s)
+{
+    if(e->env_wait[0] || e->env_wait[1])
+    {
+        return -1;
+    }
+    if(LIST_EMPTY(&(ss[s-1].wait_list)))
+    {
+        ss[s-1].num++;
+		e->env_s[s-1] = 0;
+    }else{
+        struct Env *e_first;
+        e_first = LIST_FIRST(&(ss[s-1].wait_list));
+        e_first->env_wait[s-1] = 0;
+        e_first->env_s[s-1] = 1;
+        LIST_REMOVE(e_first, env_link);
+		e->env_s[s-1] = 0;
+    }
+	return 0;
+}
+
+int get_status(struct Env *e)
+{
+    struct Env *i;
+    LIST_FOREACH(i, &(ss[0].wait_list), env_link)
+    {
+        if(i == e)
+        {
+            return 1;
+        }
+    }
+    LIST_FOREACH(i, &(ss[1].wait_list), env_link)
+    {
+        if(i == e)
+        {
+            return 1;
+        }
+    }
+    
+    if(e->env_s[0] || e->env_s[1])
+    {
+        return 2;
+    }else{
+        return 3;
+    }
+}
+
+int my_env_create()
+{
+    struct Env *e;
+    int r;
+    if((r = env_alloc(&e, 0)) != 0) return r;
+    LIST_INSERT_HEAD(&(env_sched_list[0]), e, env_link);
+    return e->env_id;
+}
+
 
 void env_check()
 {
