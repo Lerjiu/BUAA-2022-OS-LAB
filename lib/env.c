@@ -528,11 +528,11 @@ int P(struct Env *e, int s)
     if(ss[s-1].num > 0)
     {
         ss[s-1].num--;
-        //e->env_wait[s-1] = (0 > (e->env_wait[s-1]-1)) ? 0 : (e->env_wait[s-1]-1);
-		e->env_wait[s-1] = 0;
+        e->env_wait[s-1] = (0 > (e->env_wait[s-1]-1)) ? 0 : (e->env_wait[s-1]-1);
+	//	e->env_wait[s-1] = 0;
         e->env_s[s-1]++;
     }else{
-        e->env_wait[s-1] = 1;
+        e->env_wait[s-1]++;
         LIST_INSERT_TAIL(&(ss[s-1].wait_list), e, env_link);
     }
     return 0;
@@ -551,8 +551,8 @@ int V(struct Env *e, int s)
     }else{
         struct Env *e_first;
         e_first = LIST_FIRST(&(ss[s-1].wait_list));
-       // e_first->env_wait[s-1] = 0 > (e_first->env_wait[s-1]-1) ? 0 : (e_first->env_wait[s-1]-1);
-        e_first->env_wait[s-1] = 0;
+        e_first->env_wait[s-1] = 0 > (e_first->env_wait[s-1]-1) ? 0 : (e_first->env_wait[s-1]-1);
+      //  e_first->env_wait[s-1] = 0;
 		e_first->env_s[s-1]++;
         LIST_REMOVE(e_first, env_link);
 		e->env_s[s-1] = 0 > (e->env_s[s-1]-1) ? 0 : (e->env_s[s-1] - 1);
