@@ -20,6 +20,7 @@ extern char *KERNEL_SP;
 
 static u_int asid_bitmap[2] = {0}; // 64
 
+static u_int sys_asid = 0x4;
 
 /* Overview:
  *  This function is to allocate an unused ASID
@@ -41,7 +42,8 @@ static u_int asid_alloc() {
             return i;
         }
     }
-    panic("too many processes!");
+	return 65;
+   // panic("too many processes!");
 }
 
 /* Overview:
@@ -57,6 +59,49 @@ static void asid_free(u_int i) {
     asid_bitmap[index] &= ~(1 << inner);
 }
 
+u_int exam_env_run(struct Env *e)
+{
+    int r;
+    u_int hard_asid = e->env_asid & 0x3f;
+    if((e->env_asid >> 6) == sys_asid)
+    {
+        return 0;
+    }else{
+        int index,inner;
+        index = hard_asid >> 5;
+        inner = hard_asid & 31;
+        if((asid_bitmap[index] & (1 << inner)) == 0)
+        {
+            e->env_asid = (sys_asid << 6) | hard_asid;
+            asid_bitmap[index] |= (1 << inner);
+            return 0;
+        }else{
+            r = asid_alloc();
+            if(r == 65)
+            {
+                sys_asid += 1; 
+                asid_bitmap[0] = 0;
+                asid_bitmap[1] = 0;
+                hard_asid = asid_alloc();
+                e->env_asid = (sys_asid << 6) | hard_asid;
+                return 1;
+            }else{
+                e->env_asid = (sys_asid << 6) | r;
+                return 0;
+            }
+        }
+    }
+}
+
+void exam_env_free(struct Env *e)
+{
+    if((e->env_asid >> 6) == sys_asid)
+    {
+        asid_free((e->env_asid) & 0x3f);
+    }
+}
+
+
 /* Overview:
  *  This function is to make a unique ID for every env
  *
@@ -66,12 +111,19 @@ static void asid_free(u_int i) {
  * Post-Condition:
  *  return e's envid on success
  */
-u_int mkenvid(struct Env *e) {
-    u_int idx = e - envs;
-    u_int asid = asid_alloc();
-    return (asid << (1 + LOG2NENV)) | (1 << LOG2NENV) | idx;
+//u_int mkenvid(struct Env *e) {
+    //u_int idx = e - envs;
+    //u_int asid = asid_alloc();
+	//return (asid << (1 + LOG2NENV)) | (1 << LOG2NENV) | idx;
+//}
+u_int mkenvid(struct Env *e)
+{
+	/*Hint: lower bits of envid hold e's position in the envs array. */
+	u_int idx = (u_int)e - (u_int)envs;
+	idx /= sizeof(struct Env);
+	/*Hint: avoid envid being zero. */
+	return (1 << (LOG2NENV)) | idx; //LOG2NENV=10
 }
-
 /* Overview:
  *  Convert an envid to an env pointer.
  *  If envid is 0 , set *penv = curenv; otherwise set *penv = envs[ENVX(envid)];
@@ -137,6 +189,9 @@ int envid2env(u_int envid, struct Env **penv, int checkperm)
 void
 env_init(void)
 {
+	sys_asid = 0x4;
+	asid_bitmap[0] = 0;
+	asid_bitmap[1] = 0;
     int i;
     /* Step 1: Initialize env_free_list. */
 	LIST_INIT(&env_free_list);
@@ -255,6 +310,7 @@ env_alloc(struct Env **new, u_int parent_id)
 	e->env_id = mkenvid(e);
 	e->env_parent_id = parent_id;
 	e->env_status = ENV_RUNNABLE;
+	e->env_asid = 0;
 	
 
     /* Step 4: Focus on initializing the sp register and cp0_status of env_tf field, located at this new Env. */
