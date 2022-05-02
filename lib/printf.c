@@ -52,6 +52,5 @@ _panic(const char *file, int line, const char *fmt,...)
 	printf("\n");
 	va_end(ap);
 
-
 	for(;;);
 }

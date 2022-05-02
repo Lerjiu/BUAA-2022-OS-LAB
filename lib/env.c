@@ -387,7 +387,7 @@ env_create_priority(u_char *binary, int size, int priority)
     /* Step 3: Use load_icode() to load the named elf binary,
        and insert it into env_sched_list using LIST_INSERT_HEAD. */
 	load_icode(e, binary, size);
-	LIST_INSERT_HEAD(&(env_sched_list[0]), e, env_link);
+	LIST_INSERT_HEAD(&(env_sched_list[0]), e, env_sched_link);
 }
 /* Overview:
  * Allocate a new env with default priority value.
@@ -489,8 +489,14 @@ env_run(struct Env *e)
     /* Hint: if there is an environment running, 
      *   you should switch the context and save the registers. 
      *   You can imitate env_destroy() 's behaviors.*/
-	bcopy((void*)TIMESTACK - sizeof(struct Trapframe), (void*)(&(curenv->env_tf)), sizeof(struct Trapframe));
-
+	//bcopy((void*)TIMESTACK - sizeof(struct Trapframe), (void*)(&(curenv->env_tf)), sizeof(struct Trapframe));
+	if (curenv)
+    {
+        struct Trapframe *old = (struct Trapframe *)(TIMESTACK - sizeof(struct Trapframe));
+        bcopy(old, &(curenv->env_tf), sizeof(struct Trapframe));
+        curenv->env_tf.pc = curenv->env_tf.cp0_epc; // trap to kernel
+                                                    //printf("\n------\nset pc to %x\n------\n", curenv->env_tf.pc);
+    }
     /* Step 2: Set 'curenv' to the new environment. */
 	curenv = e;
 

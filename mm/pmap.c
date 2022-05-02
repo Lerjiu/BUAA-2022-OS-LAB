@@ -74,6 +74,7 @@ static void *alloc(u_int n, u_int align, int clear)
 	/* Step 4: Clear allocated chunk if parameter `clear` is set. */
 	if (clear) {
 		bzero((void *)alloced_mem, n);
+		printf("in alloc after bzero");
 	}
 
 	/* Step 5: return allocated chunk. */
@@ -103,12 +104,13 @@ static Pte *boot_pgdir_walk(Pde *pgdir, u_long va, int create)
 	if((*pgdir_entryp & PTE_V) == 0) {
 		if(create) {
 			void* tmp = alloc(BY2PG, BY2PG, 1);
+			*pgdir_entryp = PADDR(tmp);
 		//	*pgtable_entry = (PADDR(tmp) >> 12 << 12) | (PTE_V | PTE_R);
 			*pgdir_entryp = *pgdir_entryp | (PTE_V | PTE_R);
 		}
 	}
 	
-	pgtable = KADDR(PTE_ADDR(*pgdir_entryp));
+	pgtable =(Pte*)KADDR(PTE_ADDR(*pgdir_entryp));
 	/* Step 3: Get the page table entry for `va`, and return it. */
 	pgtable_entry = pgtable + PTX(va);
 	return pgtable_entry;
@@ -135,7 +137,7 @@ void boot_map_segment(Pde *pgdir, u_long va, u_long size, u_long pa, int perm)
 
 	for(i=0, size=ROUND(size,BY2PG); i<size; i+=BY2PG) {
 		pgtable_entry = boot_pgdir_walk(pgdir, va+i, 1);
-		*pgtable_entry = ((pa + i) >> 12 << 12) | perm | PTE_V;
+		*pgtable_entry = PTE_ADDR(pa + i) | (perm | PTE_V);
 	}
 }
 
