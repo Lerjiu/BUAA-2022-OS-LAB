@@ -305,7 +305,7 @@ static int load_icode_mapper(u_long va, u_int32_t sgsize,
 			bcopy((void*)bin, (void*)(page2kva(p)+offset), BY2PG-offset);
 		}else if((i+BY2PG)>(bin_size+offset)){
 			bcopy((void*)(bin+i-offset), (void*)page2kva(p), bin_size+offset-i);
-		//	bzero((void*)page2kva(p), i+BY2PG-bin_size-offset);
+		//bzero((void*)page2kva(p), i+BY2PG-bin_size-offset);
 		}else{
 			bcopy((void*)(bin+i-offset), (void*)page2kva(p), BY2PG);
 		}
