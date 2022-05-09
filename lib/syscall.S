@@ -33,7 +33,7 @@ NESTED(handle_sys,TF_SIZE, sp)
 	lw		a1, TF_REG5(sp)
 	lw		a2, TF_REG6(sp)
 	lw		a3, TF_REG7(sp)
-	addiu	sp, sp, 24
+	addiu	sp, sp, -24
 	sw		a0, 0(sp)
 	sw		a1, 4(sp)
 	sw		a2, 8(sp)
@@ -70,3 +70,4 @@ sys_call_table:                         // Syscall Table
     .word sys_ipc_can_send
     .word sys_ipc_recv
     .word sys_cgetc
+

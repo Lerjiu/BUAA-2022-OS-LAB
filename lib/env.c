@@ -1,6 +1,3 @@
-/* Notes written by Qian Liu <qianlxc@outlook.com>
-  If you find any bug, please contact with me.*/
-
 #include <mmu.h>
 #include <error.h>
 #include <env.h>
@@ -655,4 +652,5 @@ void load_icode_check() {
     env_free(e);
     printf("load_icode_check() succeeded!\n");
 }
+
 
