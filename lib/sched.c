@@ -55,10 +55,13 @@ void sched_yield(void)
 					point = point + 1;
 				}
 			}
+
 			e = LIST_FIRST(&env_sched_list[point]);
+
 			if (e->env_status == ENV_FREE)
+			{	
 				LIST_REMOVE(e, env_sched_link);
-			else if (e->env_status == ENV_NOT_RUNNABLE)
+			}else if(e->env_status == ENV_NOT_RUNNABLE)
 			{
 				LIST_REMOVE(e, env_sched_link);
 				if(((e->env_pri) % 2) == 0)
@@ -70,9 +73,7 @@ void sched_yield(void)
 					LIST_INSERT_TAIL(&env_sched_list[(point+1)%3], e, env_sched_link);
                 }
 			//	LIST_INSERT_TAIL(&env_sched_list[1 - point], e, env_sched_link);
-			}
-			else
-			{
+			}else{
 				if(point == 0)
 				{
 					count = e->env_pri;
