@@ -112,6 +112,7 @@ void sched_yield(void)
 	}
 //	printf("\n");	
 	count--;
+	e->env_runs++;
 //	printf("\n");
 	env_run(e);
 //	env_run(LIST_FIRST(env_sched_list));
