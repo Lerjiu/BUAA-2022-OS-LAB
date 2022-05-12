@@ -53,7 +53,9 @@ void sched_yield(void)
 		while(1)
 		{
 			while(LIST_EMPTY(&env_sched_list[point]))
-				point = (point + 1) % 3;
+			{				
+				point = ((point + 1) % 3);
+			}
 
 			e = LIST_FIRST(&env_sched_list[point]);
 
