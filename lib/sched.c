@@ -42,9 +42,9 @@ void sched_yield(void)
 				int tmp;
 				if((e->env_pri%2) == 1)
 				{
-					tmp = (point + 1)%3;
+					tmp = (point + 1) % 3;
 				}else{
-					tmp = (point + 2)%3;
+					tmp = (point + 2) % 3;
 				}
 				LIST_INSERT_TAIL(&env_sched_list[tmp], e, env_sched_link);
 			}
@@ -65,9 +65,9 @@ void sched_yield(void)
 				int tmp;
                 if((e->env_pri%2) == 1)
                 {
-                    tmp = (point + 1)%3;
+                    tmp = (point + 1) % 3;
                 }else{
-                    tmp = (point + 2)%3;
+                    tmp = (point + 2) % 3;
                 }
 				LIST_INSERT_TAIL(&env_sched_list[tmp], e, env_sched_link);
 			}else{
@@ -76,8 +76,9 @@ void sched_yield(void)
 			}
 		}
 	}
-	printf("\n");	
+//	printf("\n");	
 	count--;
+	printf("\n");
 	env_run(e);
 //	env_run(LIST_FIRST(env_sched_list));
 //	printf("\n");
