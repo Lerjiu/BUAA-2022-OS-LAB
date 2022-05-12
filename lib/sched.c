@@ -39,7 +39,7 @@ void sched_yield(void)
 			LIST_REMOVE(e, env_sched_link);
 			if(e->env_status != ENV_FREE)
 			{
-				if((e->env_pri%2) == 1)
+				if(((e->env_pri) % 2) == 1)
 				{
 					if(point == 0)
 						LIST_INSERT_TAIL(&env_sched_list[1], e, env_sched_link);
@@ -76,7 +76,7 @@ void sched_yield(void)
 				LIST_REMOVE(e, env_sched_link);
 			}else if(e->env_status == ENV_NOT_RUNNABLE){
 				LIST_REMOVE(e, env_sched_link);
-				if((e->env_pri%2) == 1)
+				if(((e->env_pri) % 2) == 1)
                 {
                     if(point == 0)
                         LIST_INSERT_TAIL(&env_sched_list[1], e, env_sched_link);
@@ -93,7 +93,14 @@ void sched_yield(void)
                         LIST_INSERT_TAIL(&env_sched_list[1], e, env_sched_link);
                 }
 			}else{
-				count = e->env_pri * (1 << point);
+				if(point == 0)
+				{
+					count = e->env_pri;
+				}else if(point == 1){
+					count = e->env_pri * 2;
+				}else{
+					count = e->env_pri * 4;
+				}
 				break;
 			}
 		}
