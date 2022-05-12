@@ -74,7 +74,7 @@ static void *alloc(u_int n, u_int align, int clear)
 	/* Step 4: Clear allocated chunk if parameter `clear` is set. */
 	if (clear) {
 		bzero((void *)alloced_mem, n);
-		printf("in alloc after bzero");
+//		printf("in alloc after bzero");
 	}
 
 	/* Step 5: return allocated chunk. */

@@ -4,7 +4,7 @@
 #include <printf.h>
 #include <kclock.h>
 #include <trap.h>
-
+/*
 void mips_init()
 {
 	u_int *target;
@@ -29,7 +29,7 @@ void mips_init()
 	/*you may want to create process by MACRO, please read env.h file, in which you will find it. this MACRO is very
 	 * interesting, have fun please*/
 
-	printf("before create A: 0x%x\n",*target);
+/*	printf("before create A: 0x%x\n",*target);
 	ENV_CREATE_PRIORITY(user_A, 2);
 	printf("before create B: 0x%x\n",*target);
 	ENV_CREATE_PRIORITY(user_B, 1);
@@ -42,7 +42,25 @@ void mips_init()
 	printf("after panic\n");
 	while(1);
 	panic("init.c:\tend of mips_init() reached!");
+}*/
+
+void mips_init()
+{
+printf("init.c:\tmips_init() is called\n");
+mips_detect_memory();
+mips_vm_init();
+page_init();
+env_init();
+// for lab3-2-exam local test
+ENV_CREATE_PRIORITY(user_A, 2);
+ENV_CREATE_PRIORITY(user_B, 1);
+trap_init();
+kclock_init();
+panic("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+while(1);
+panic("init.c:\tend of mips_init() reached!");
 }
+
 
 void bcopy(const void *src, void *dst, size_t len)
 {
