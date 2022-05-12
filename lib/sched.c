@@ -39,14 +39,22 @@ void sched_yield(void)
 			LIST_REMOVE(e, env_sched_link);
 			if(e->env_status != ENV_FREE)
 			{
-				int tmp;
 				if((e->env_pri%2) == 1)
 				{
-					tmp = (point + 1) % 3;
+					if(point == 0)
+						LIST_INSERT_TAIL(&env_sched_list[1], e, env_sched_link);
+					if(point == 1)
+						LIST_INSERT_TAIL(&env_sched_list[2], e, env_sched_link);
+					if(point == 2)
+						LIST_INSERT_TAIL(&env_sched_list[0], e, env_sched_link);
 				}else{
-					tmp = (point + 2) % 3;
+					if(point == 0)
+                        LIST_INSERT_TAIL(&env_sched_list[2], e, env_sched_link);
+                    if(point == 1)
+                        LIST_INSERT_TAIL(&env_sched_list[0], e, env_sched_link);
+                    if(point == 2)
+                        LIST_INSERT_TAIL(&env_sched_list[1], e, env_sched_link);
 				}
-				LIST_INSERT_TAIL(&env_sched_list[tmp], e, env_sched_link);
 			}
 		}
 		
@@ -64,14 +72,22 @@ void sched_yield(void)
 				LIST_REMOVE(e, env_sched_link);
 			}else if(e->env_status == ENV_NOT_RUNNABLE){
 				LIST_REMOVE(e, env_sched_link);
-				int tmp;
-                if((e->env_pri % 2) == 1)
+				if((e->env_pri%2) == 1)
                 {
-                    tmp = (point + 1) % 3;
+                    if(point == 0)
+                        LIST_INSERT_TAIL(&env_sched_list[1], e, env_sched_link);
+                    if(point == 1)
+                        LIST_INSERT_TAIL(&env_sched_list[2], e, env_sched_link);
+                    if(point == 2)
+                        LIST_INSERT_TAIL(&env_sched_list[0], e, env_sched_link);
                 }else{
-                    tmp = (point + 2) % 3;
+                    if(point == 0)
+                        LIST_INSERT_TAIL(&env_sched_list[2], e, env_sched_link);
+                    if(point == 1)
+                        LIST_INSERT_TAIL(&env_sched_list[0], e, env_sched_link);
+                    if(point == 2)
+                        LIST_INSERT_TAIL(&env_sched_list[1], e, env_sched_link);
                 }
-				LIST_INSERT_TAIL(&env_sched_list[tmp], e, env_sched_link);
 			}else{
 				count = e->env_pri * (1 << point);
 				break;
