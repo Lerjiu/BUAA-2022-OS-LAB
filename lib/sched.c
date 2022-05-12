@@ -49,11 +49,9 @@ void sched_yield(void)
 		{
 			while (LIST_EMPTY(&env_sched_list[point]))
 			{
-				if(point == 2){
+				point++;
+				if(point == 3)
 					point = 0;
-				}else{
-					point = point + 1;
-				}
 			}
 
 			e = LIST_FIRST(&env_sched_list[point]);
@@ -88,7 +86,7 @@ void sched_yield(void)
 		}
 	}
 	count--;
-	printf("\n");
+//	printf("\n");
 	env_run(e);
 	//	env_run(LIST_FIRST(env_sched_list));
 }
