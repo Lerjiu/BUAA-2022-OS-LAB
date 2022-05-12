@@ -15,7 +15,7 @@
 
 void sched_yield(void)
 {
-	printf("\n");
+//	printf("\n");
     static int count = 0; // remaining time slices of current env
     static int point = 0; // current env_sched_list index
     static struct Env *e = NULL;
@@ -76,8 +76,9 @@ void sched_yield(void)
 			}
 		}
 	}
-	
+	printf("\n");	
 	count--;
 	env_run(e);
 //	env_run(LIST_FIRST(env_sched_list));
+//	printf("\n");
 }
