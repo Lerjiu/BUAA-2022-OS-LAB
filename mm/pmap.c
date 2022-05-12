@@ -606,8 +606,8 @@ void page_check(void)
     assert(page_insert(boot_pgdir, pp1, 0x0, 0) == 0);
     assert(PTE_ADDR(boot_pgdir[0]) == page2pa(pp0));
 
-    printf("va2pa(boot_pgdir, 0x0) is %x\n", va2pa(boot_pgdir, 0x0));
-    printf("page2pa(pp1) is %x\n", page2pa(pp1));
+//    printf("va2pa(boot_pgdir, 0x0) is %x\n", va2pa(boot_pgdir, 0x0));
+  //  printf("page2pa(pp1) is %x\n", page2pa(pp1));
     //	printf("pp1->pp_ref is %d\n",pp1->pp_ref);
     assert(va2pa(boot_pgdir, 0x0) == page2pa(pp1));
     assert(pp1->pp_ref == 1);
@@ -620,7 +620,7 @@ void page_check(void)
     // should be no free memory
     assert(page_alloc(&pp) == -E_NO_MEM);
 
-    printf("start page_insert\n");
+    //printf("start page_insert\n");
     // should be able to map pp2 at BY2PG because it's already there
     assert(page_insert(boot_pgdir, pp2, BY2PG, 0) == 0);
     assert(va2pa(boot_pgdir, BY2PG) == page2pa(pp2));
@@ -641,9 +641,9 @@ void page_check(void)
     assert(va2pa(boot_pgdir, BY2PG) == page2pa(pp1));
     // ... and ref counts should reflect this
     assert(pp1->pp_ref == 2);
-    printf("pp2->pp_ref %d\n", pp2->pp_ref);
+ //   printf("pp2->pp_ref %d\n", pp2->pp_ref);
     assert(pp2->pp_ref == 0);
-    printf("end page_insert\n");
+  //  printf("end page_insert\n");
 
     // pp2 should be returned by page_alloc
     assert(page_alloc(&pp) == 0 && pp == pp2);

@@ -609,10 +609,10 @@ void load_icode_check() {
     assert(pgdir_walk(e->env_pgdir, 0x00402000, 0, &pte) == 0);
     //printf("*((int *)KADDR(PTE_ADDR(*pte))) =0x%x\n",*((int *)KADDR(PTE_ADDR(*pte))));
 	
-	for(i=1;i<400;i++)
-	{
+	//for(i=1;i<400;i++)
+	//{
 		//printf("the content of pte+%d = 0x%x\n",i,*((int *)KADDR(PTE_ADDR(*pte)) + i));
-	}
+	//}
     assert(*((int *)KADDR(PTE_ADDR(*pte))) == 0x10800004);
     assert(*((int *)KADDR(PTE_ADDR(*pte)) + 1023) == 0x00801821);
     assert(pgdir_walk(e->env_pgdir, 0x00403000, 0, &pte) == 0);
