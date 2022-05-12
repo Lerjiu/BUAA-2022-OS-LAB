@@ -63,7 +63,7 @@ void sched_yield(void)
 			}else if(e->env_status == ENV_NOT_RUNNABLE){
 				LIST_REMOVE(e, env_sched_link);
 				int tmp;
-                if((e->env_pri%2) == 1)
+                if((e->env_pri % 2) == 1)
                 {
                     tmp = (point + 1) % 3;
                 }else{
