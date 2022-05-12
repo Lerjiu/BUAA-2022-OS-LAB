@@ -41,19 +41,21 @@ void sched_yield(void)
 			{
 				if(((e->env_pri) % 2) == 1)
 				{
-					if(point == 0)
-						LIST_INSERT_TAIL(&env_sched_list[1], e, env_sched_link);
-					if(point == 1)
-						LIST_INSERT_TAIL(&env_sched_list[2], e, env_sched_link);
-					if(point == 2)
-						LIST_INSERT_TAIL(&env_sched_list[0], e, env_sched_link);
+				//	if(point == 0)
+				//		LIST_INSERT_TAIL(&env_sched_list[1], e, env_sched_link);
+				//	if(point == 1)
+				//		LIST_INSERT_TAIL(&env_sched_list[2], e, env_sched_link);
+				//	if(point == 2)
+				//		LIST_INSERT_TAIL(&env_sched_list[0], e, env_sched_link);
+					LIST_INSERT_TAIL(&env_sched_list[(point+1)%3], e, env_sched_link);
 				}else{
-					if(point == 0)
-                        LIST_INSERT_TAIL(&env_sched_list[2], e, env_sched_link);
-                    if(point == 1)
-                        LIST_INSERT_TAIL(&env_sched_list[0], e, env_sched_link);
-                    if(point == 2)
-                        LIST_INSERT_TAIL(&env_sched_list[1], e, env_sched_link);
+				//	if(point == 0)
+                //       LIST_INSERT_TAIL(&env_sched_list[2], e, env_sched_link);
+                 //   if(point == 1)
+                   //     LIST_INSERT_TAIL(&env_sched_list[0], e, env_sched_link);
+                 //   if(point == 2)
+                   //     LIST_INSERT_TAIL(&env_sched_list[1], e, env_sched_link);
+					LIST_INSERT_TAIL(&env_sched_list[(point+2)%3], e, env_sched_link);
 				}
 			}
 		}
@@ -62,11 +64,12 @@ void sched_yield(void)
 		{
 			while(LIST_EMPTY(&env_sched_list[point]))
 			{				
-				if(point == 2){
-					point = 0;
-				}else{
-					point++;
-				}
+			//	if(point == 2){
+			//		point = 0;
+			//	}else{
+			//		point++;
+			//	}
+				point = (point + 1)%3;
 			}
 
 			e = LIST_FIRST(&env_sched_list[point]);
@@ -78,19 +81,21 @@ void sched_yield(void)
 				LIST_REMOVE(e, env_sched_link);
 				if(((e->env_pri) % 2) == 1)
                 {
-                    if(point == 0)
-                        LIST_INSERT_TAIL(&env_sched_list[1], e, env_sched_link);
-                    if(point == 1)
-                        LIST_INSERT_TAIL(&env_sched_list[2], e, env_sched_link);
-                    if(point == 2)
-                        LIST_INSERT_TAIL(&env_sched_list[0], e, env_sched_link);
+					LIST_INSERT_TAIL(&env_sched_list[(point+1)%3], e, env_sched_link);
+                 //   if(point == 0)
+                 //       LIST_INSERT_TAIL(&env_sched_list[1], e, env_sched_link);
+                 //   if(point == 1)
+                 //       LIST_INSERT_TAIL(&env_sched_list[2], e, env_sched_link);
+                 //   if(point == 2)
+                 //       LIST_INSERT_TAIL(&env_sched_list[0], e, env_sched_link);
                 }else{
-                    if(point == 0)
+                    /*if(point == 0)
                         LIST_INSERT_TAIL(&env_sched_list[2], e, env_sched_link);
                     if(point == 1)
                         LIST_INSERT_TAIL(&env_sched_list[0], e, env_sched_link);
                     if(point == 2)
-                        LIST_INSERT_TAIL(&env_sched_list[1], e, env_sched_link);
+                        LIST_INSERT_TAIL(&env_sched_list[1], e, env_sched_link);*/
+					LIST_INSERT_TAIL(&env_sched_list[(point+2)%3], e, env_sched_link);
                 }
 			}else{
 				if(point == 0)
