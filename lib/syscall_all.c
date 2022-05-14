@@ -290,6 +290,10 @@ int sys_set_env_status(int sysno, u_int envid, u_int status)
 	// Your code here.
 	struct Env *env;
 	int ret;
+	if (status != ENV_RUNNABLE && status != ENV_NOT_RUNNABLE && status != ENV_FREE)
+	{
+		return -E_INVAL;
+	}
 	ret = envid2env(envid, &env, 0);
 	if(ret < 0) return ret;
 
@@ -378,17 +382,15 @@ void sys_ipc_recv(int sysno, u_int dstva)
  * Hint: the only function you need to call is envid2env.
  */
 /*** exercise 4.7 ***/
-int sys_ipc_can_send(int sysno, u_int envid, u_int value, u_int srcva,
-					 u_int perm)
+int sys_ipc_can_send(int sysno, u_int envid, u_int value, u_int srcva, u_int perm)
 {
-
 	int r;
 	struct Env *e;
 	struct Page *p;
 
-	if(srcva >= UTOP)
+	if(srcva >= UTOP || ((perm & PTE_V) == 0))
 		return -E_INVAL;
-
+	
 	r = envid2env(envid, &e, 0);
 	if(r < 0) return r;
 
@@ -399,7 +401,7 @@ int sys_ipc_can_send(int sysno, u_int envid, u_int value, u_int srcva,
 	e->env_ipc_from = curenv->env_id;
 	e->env_ipc_recving = 0;
 	e->env_ipc_perm = perm;
-
+	e->env_status = ENV_RUNNABLE;
 	if(srcva != 0) {
 		p = page_lookup(curenv->env_pgdir, srcva, NULL);
 		if((p == NULL) || (e->env_ipc_dstva >= UTOP))
@@ -409,3 +411,4 @@ int sys_ipc_can_send(int sysno, u_int envid, u_int value, u_int srcva,
 	}
 	return 0;
 }
+
