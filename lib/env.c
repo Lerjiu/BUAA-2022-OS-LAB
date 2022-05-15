@@ -200,7 +200,7 @@ env_setup_vm(struct Env *e)
 	bcopy((void*)(boot_start), (void*)start, 0x808);
 
     /* UVPT maps the env's own page table, with read-only permission.*/
-    e->env_pgdir[PDX(UVPT)]  = e->env_cr3 | PTE_V;
+    e->env_pgdir[PDX(UVPT)]  = e->env_cr3 | PTE_V | PTE_R;
     return 0;
 }
 
@@ -353,11 +353,11 @@ load_icode(struct Env *e, u_char *binary, u_int size)
 
     /* Step 2: Use appropriate perm to set initial stack for new Env. */
     /* Hint: Should the user-stack be writable? */
-	page_insert(e->env_pgdir, p, USTACKTOP-BY2PG, PTE_V|PTE_R);
-	
+	r = page_insert(e->env_pgdir, p, USTACKTOP-BY2PG, PTE_V|PTE_R);
+	if(r != 0) return;
     /* Step 3: load the binary using elf loader. */
-	load_elf(binary, size, &entry_point, (void*)e, load_icode_mapper);
-	
+	r = load_elf(binary, size, &entry_point, (void*)e, load_icode_mapper);
+	if(r != 0) return;
     /* Step 4: Set CPU's PC register as appropriate value. */
     e->env_tf.pc = entry_point;
 }
@@ -378,7 +378,8 @@ env_create_priority(u_char *binary, int size, int priority)
     struct Env *e;
     /* Step 1: Use env_alloc to alloc a new env. */
 	
-	env_alloc(&e, 0);
+	if(env_alloc(&e, 0) != 0)
+		return;
     /* Step 2: assign priority to the new env. */
 	e->env_pri = priority;
     /* Step 3: Use load_icode() to load the named elf binary,

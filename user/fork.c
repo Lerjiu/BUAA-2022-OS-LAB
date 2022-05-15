@@ -4,14 +4,15 @@
 #include <mmu.h>
 #include <env.h>
 
+
 /* ----------------- help functions ---------------- */
 
 /* Overview:
  * 	Copy `len` bytes from `src` to `dst`.
  *
  * Pre-Condition:
- * 	`src` and `dst` can't be NULL. Also, the `src` area 
- * 	 shouldn't overlap the `dest`, otherwise the behavior of this 
+ * 	`src` and `dst` can't be NULL. Also, the `src` area
+ * 	 shouldn't overlap the `dest`, otherwise the behavior of this
  * 	 function is undefined.
  */
 void user_bcopy(const void *src, void *dst, size_t len)
@@ -22,10 +23,8 @@ void user_bcopy(const void *src, void *dst, size_t len)
 	max = dst + len;
 
 	// copy machine words while possible
-	if (((int)src % 4 == 0) && ((int)dst % 4 == 0))
-	{
-		while (dst + 3 < max)
-		{
+	if (((int)src % 4 == 0) && ((int)dst % 4 == 0)) {
+		while (dst + 3 < max) {
 			*(int *)dst = *(int *)src;
 			dst += 4;
 			src += 4;
@@ -33,8 +32,7 @@ void user_bcopy(const void *src, void *dst, size_t len)
 	}
 
 	// finish remaining 0-3 bytes
-	while (dst < max)
-	{
+	while (dst < max) {
 		*(char *)dst = *(char *)src;
 		dst += 1;
 		src += 1;
@@ -44,14 +42,14 @@ void user_bcopy(const void *src, void *dst, size_t len)
 }
 
 /* Overview:
- * 	Sets the first n bytes of the block of memory 
+ * 	Sets the first n bytes of the block of memory
  * pointed by `v` to zero.
- * 
+ *
  * Pre-Condition:
  * 	`v` must be valid.
  *
  * Post-Condition:
- * 	the content of the space(from `v` to `v`+ n) 
+ * 	the content of the space(from `v` to `v`+ n)
  * will be set to zero.
  */
 void user_bzero(void *v, u_int n)
@@ -62,8 +60,7 @@ void user_bzero(void *v, u_int n)
 	p = v;
 	m = n;
 
-	while (--m >= 0)
-	{
+	while (--m >= 0) {
 		*p++ = 0;
 	}
 }
@@ -72,13 +69,13 @@ void user_bzero(void *v, u_int n)
 /* Overview:
  * 	Custom page fault handler - if faulting page is copy-on-write,
  * map in our own private writable copy.
- * 
+ *
  * Pre-Condition:
  * 	`va` is the address which leads to a TLBS exception.
  *
  * Post-Condition:
  *  Launch a user_panic if `va` is not a copy-on-write page.
- * Otherwise, this handler should map a private writable copy of 
+ * Otherwise, this handler should map a private writable copy of
  * the faulting page at correct address.
  */
 /*** exercise 4.13 ***/
@@ -87,14 +84,14 @@ pgfault(u_int va)
 {
 	u_int *tmp = USTACKTOP;
 	//	writef("fork.c:pgfault():\t va:%x\n",va);
-	u_long perm = ((Pte *)(*vpt))[VPN(va)] & 0xfff;
-	if ((perm & PTE_COW) == 0)
-	{
+	u_int perm = ((Pte *)(*vpt))[VPN(va)] & 0xfff;
+	if((perm & PTE_COW) == 0)
 		user_panic("pgfault err: COW not found");
-	}
+
 	perm -= PTE_COW;
-	//map the new page at a temporary place
 	syscall_mem_alloc(0, tmp, perm);
+	//map the new page at a temporary place
+
 	//copy the content
 	user_bcopy(ROUNDDOWN(va, BY2PG), tmp, BY2PG);
 	//map the page on the appropriate place
@@ -105,15 +102,15 @@ pgfault(u_int va)
 
 /* Overview:
  * 	Map our virtual page `pn` (address pn*BY2PG) into the target `envid`
- * at the same virtual address. 
+ * at the same virtual address.
  *
  * Post-Condition:
- *  if the page is writable or copy-on-write, the new mapping must be 
- * created copy on write and then our mapping must be marked 
+ *  if the page is writable or copy-on-write, the new mapping must be
+ * created copy on write and then our mapping must be marked
  * copy on write as well. In another word, both of the new mapping and
- * our mapping should be copy-on-write if the page is writable or 
+ * our mapping should be copy-on-write if the page is writable or
  * copy-on-write.
- * 
+ *
  * Hint:
  * 	PTE_LIBRARY indicates that the page is shared between processes.
  * A page with PTE_LIBRARY may have PTE_R at the same time. You
@@ -135,6 +132,7 @@ duppage(u_int envid, u_int pn)
 	syscall_mem_map(0, addr, envid, addr, perm);
 	if (flag)
 		syscall_mem_map(0, addr, 0, addr, perm);
+	
 	//	user_panic("duppage not implemented");
 }
 
@@ -144,33 +142,34 @@ duppage(u_int envid, u_int pn)
  *
  * Hint: use vpd, vpt, and duppage.
  * Hint: remember to fix "env" in the child process!
- * Note: `set_pgfault_handler`(user/pgfault.c) is different from 
- *       `syscall_set_pgfault_handler`. 
+ * Note: `set_pgfault_handler`(user/pgfault.c) is different from
+ *       `syscall_set_pgfault_handler`.
  */
 /*** exercise 4.9 4.15***/
 extern void __asm_pgfault_handler(void);
-int fork(void)
+int
+fork(void)
 {
 	// Your code here.
 	u_int newenvid;
 	extern struct Env *envs;
 	extern struct Env *env;
 	u_int i;
-
-	//The parent installs pgfault using set_pgfault_handler
+	
 	set_pgfault_handler(pgfault);
-
-	//alloc a new alloc
+	
 	newenvid = syscall_env_alloc();
-	if (newenvid == 0)
+	if(newenvid == 0)
 	{
 		env = envs + ENVX(syscall_getenvid());
 		return 0;
 	}
+	//The parent installs pgfault using set_pgfault_handler
 
-	for (i = 0; i < VPN(USTACKTOP); ++i)
+	//alloc a new alloc
+	for(i = 0; i < VPN(USTACKTOP); i++)
 	{
-		if (((*vpd)[i >> 10] & PTE_V) && ((*vpt)[i] & PTE_V))
+		if(((*vpd)[i>>10] & PTE_V) && ((*vpt)[i] & PTE_V))
 			duppage(newenvid, i);
 	}
 	syscall_mem_alloc(newenvid, UXSTACKTOP - BY2PG, PTE_V | PTE_R);
@@ -180,8 +179,10 @@ int fork(void)
 }
 
 // Challenge!
-int sfork(void)
+int
+sfork(void)
 {
 	user_panic("sfork not implemented");
 	return -E_INVAL;
 }
+
