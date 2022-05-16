@@ -2,7 +2,7 @@
 // Created by 李文豪 on 2022/5/16.
 //
 
-//#include "stdlib.h"
+#include "stdlib.h"
 #include "sched.h"
 #define max(x,y) (x)>(y)?(x):(y)
 
@@ -67,8 +67,8 @@ void SJF(int number_of_jobs,
 
         int wait_sched = i;
         int index;
-        PCB sched_progress = {0x7fffffff, 0x7fffffff, 0x7fffffff};
-        while (progress[wait_sched].submitted_time <= time) {
+        PCB sched_progress = {0x7fffffff,0x7fffffff,0x7fffffff};
+        while (progress[wait_sched].submitted_time <= time && wait_sched < number_of_jobs) {
             if (cmp(sched_progress, progress[wait_sched]) > 0) {
                 sched_progress = progress[wait_sched];
                 index = wait_sched;
