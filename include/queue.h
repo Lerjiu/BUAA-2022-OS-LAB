@@ -111,8 +111,9 @@
  */
 #define LIST_INSERT_AFTER(listelm, elm, field) do {							\
 				(elm)->field.le_next = (listelm)->field.le_next;				\
-				if (LIST_NEXT((listelm), field))								\
+				if(LIST_NEXT((listelm), field)){								\
 					LIST_NEXT((listelm), field)->field.le_prev = &LIST_NEXT((elm), field);	\
+				}																\
 				LIST_NEXT((listelm), field) = (elm);							\
 				(elm)->field.le_prev = &LIST_NEXT((listelm), field);			\
 		} while (0)
@@ -152,7 +153,7 @@
  * Note: this function has big differences with LIST_INSERT_HEAD !
  */
 #define LIST_INSERT_TAIL(head, elm, field) do {											\
-			if (LIST_FIRST(head)) {														\
+			if(LIST_FIRST(head) != NULL){														\
 				(elm)->field.le_next = LIST_FIRST((head));								\
 				while(LIST_NEXT(LIST_NEXT((elm), field), field)) {						\
 					(elm)->field.le_next = LIST_NEXT(LIST_NEXT((elm), field), field);	\
@@ -160,7 +161,7 @@
 				LIST_NEXT(LIST_NEXT((elm), field), field) = (elm);						\
 				(elm)->field.le_prev = &LIST_NEXT(LIST_NEXT((elm), field), field);		\
 				(elm)->field.le_next = NULL;											\
-			} else {																	\
+			}else{																	\
 				LIST_INSERT_HEAD((head), (elm), field);									\
 			}																			\
 		}while(0)
