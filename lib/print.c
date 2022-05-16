@@ -28,9 +28,9 @@ static const char theFatalMsg[] = "fatal error in lp_Print!";
  */
 void
 lp_Print(void (*output)(void *, char *, int), 
-	 void * arg,
-	 char *fmt, 
-	 va_list ap)
+	 void * arg, // I don't understand
+	 char *fmt,  // the format string
+	 va_list ap) // varlist store vars to be replaced into format string
 {
 
 #define 	OUTPUT(arg, s, l)  \
@@ -40,6 +40,7 @@ lp_Print(void (*output)(void *, char *, int),
       (*output)(arg, s, l); \
     } \
   }
+// OUTPUT(arg point, startPoint of the output string, len of the string you want to output) 
     
     char buf[LP_MAX_BUF];
 
@@ -49,78 +50,88 @@ lp_Print(void (*output)(void *, char *, int),
 
 	
 
-    int longFlag = 0;
-    int negFlag = 0;
-    int width = 0;
-    int prec = 0;
-    int ladjust = 0;
-    char padc = ' ';
+    int longFlag;
+    int negFlag;
+    int width;
+    int prec;
+    int ladjust;
+    char padc;
 
-    int length = 0;
+    int length;
 
     /*
         Exercise 1.5. Please fill in two parts in this file.
     */
-
-    for(;(*fmt);) {
+    
+    for(;;) {
 
         /* Part1: your code here */
-	int buf_len = 0;
-	while((*fmt)!='%'&&(*fmt)!='\0')
+
 	{ 
 	    /* scan for the next '%' */
-		
-	    /* flush the string found so far */
-
-	    /* check "are we hitting the end?" */
-		buf[buf_len++] = *fmt;
-		fmt++;
-	}
-	buf[buf_len] = '\0';
-	if(buf_len != 0) {
-		OUTPUT(arg, buf, buf_len);
-	}
-	/* we found a '%' */
-	
-	/* check for long */
-
-	/* check for other prefixes */
-
-	/* check format flag */
-	if((*fmt) == '%') {
-		fmt++;
-		if((*fmt) == '-') {
-			ladjust = 1;
-			padc = ' ';
-			fmt++;
-		} else if((*fmt) == '0') {
-			ladjust = 0;
-			fmt++;
-			padc = '0';
-		}
-		
-		width = 0;
-		while (IsDigit((*fmt))) {
-			width = width * 10 + Ctod((*fmt));
-			fmt++;
-		}
-		
-		prec = 0;
-		if((*fmt) == '.') {
-			fmt++;
-			while (IsDigit((*fmt))) {
-				prec = prec * 10 + Ctod((*fmt));
-				fmt++;
+	    for (s = fmt; *s != '\0'; s ++) {
+			if (*s == '%') {
+				break;
 			}
 		}
-		
-		if((*fmt) == 'l') {
-			longFlag  = 1;
-			fmt++;
-		}
+		/* flush the string found so far */
+		OUTPUT(arg, fmt, s - fmt); // output the string before this %
+		fmt = s; // renew the start point		
+	    /* check "are we hitting the end?" */
+		if (*fmt == '\0') {
+			break; // if end then break for
+		} 
 	}
 
-	negFlag = 0;
+	// %[flags][width][.precision][length]specifier
+	/* we found a '%' */
+	fmt ++; // ++ to read next char
+	/* check for long */
+
+	// to checkout min length will we output
+	// include flags and width
+	padc = ' '; // default: output " " in blank
+	ladjust = 0; // mark if left justing 
+	if (*fmt == '-') {
+		ladjust = 1;
+		fmt ++;
+	} 
+
+	if (*fmt == '0') {
+		padc = '0'; // fill blank with '0'
+		fmt ++;
+	}
+
+	// identify the width
+	width = 0;
+	if (IsDigit(*fmt)) {
+		width = width * 10 + Ctod(*fmt);
+		fmt ++;
+	}
+		
+	/* check for other prefixes */
+	// make prec
+	if (*fmt == '.') {
+		prec = 0;
+		fmt ++;
+		while(IsDigit(*fmt)) {
+			prec = prec * 10 + Ctod(*fmt);
+			fmt ++;
+		}
+	} else {
+		prec = 6; // default prec = 6;
+	}
+	
+	/* check format flag */
+	
+
+	negFlag = 0; 
+	longFlag = 0;   
+	if (*fmt == 'l') {
+		longFlag = 1;
+		fmt ++;
+	}
+
 	switch (*fmt) {
 	 case 'b':
 	    if (longFlag) { 
@@ -145,12 +156,13 @@ lp_Print(void (*output)(void *, char *, int),
 			Refer to other part (case 'b',case 'o' etc.) and func PrintNum to complete this part.
 			Think the difference between case 'd' and others. (hint: negFlag).
 		*/
-		if(num < 0){
-			 num = ~num + 1;
+		// devide neg int and unneg int
+		if (num < 0) {
 			negFlag = 1;
+	    	num = -num;
 		}
 		length = PrintNum(buf, num, 10, negFlag, width, ladjust, padc, 0);
-	    OUTPUT(arg, buf, length);
+		OUTPUT(arg, buf, length);
 		break;
 
 	 case 'o':
