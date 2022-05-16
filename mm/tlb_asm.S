@@ -23,6 +23,7 @@ nop
 	nop
 	// insert tlbp or tlbwi
 	tlbwi
+	nop
 NOFOUND:
 
 	mtc0	k1,CP0_ENTRYHI
