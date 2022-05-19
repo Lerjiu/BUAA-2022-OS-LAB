@@ -42,6 +42,8 @@ int sys_release_console()
  */
 void sys_putchar(int sysno, int c, int a2, int a3, int a4, int a5)
 {
+	if((lock != curenv))
+	return ;
     printcharc((char) c);
     return ;
 }
