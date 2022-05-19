@@ -11,6 +11,29 @@
 extern char *KERNEL_SP;
 extern struct Env *curenv;
 
+static struct Env *lock = NULL;
+
+int sys_try_acquire_console()
+{
+	if(lock == NULL)
+	{
+		lock = curenv;
+		return 0;
+	}else{
+		return -1;
+	}
+}
+
+int sys_release_console()
+{
+	if(lock == curenv)
+	{
+		lock = NULL;
+		return 0;
+	}
+	return -1;
+}
+
 /* Overview:
  * 	This function is used to print a character on screen.
  *

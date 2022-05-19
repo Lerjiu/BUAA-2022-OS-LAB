@@ -4,6 +4,16 @@
 #include <env.h>
 #include <trap.h>
 
+int syscall_try_acquire_console(void)
+{
+	return msyscall(SYS_try_acquire_console, 0, 0, 0, 0, 0);
+}
+
+int syscall_release_console(void)
+{
+	return msyscall(SYS_release_console, 0, 0, 0, 0, 0);
+}
+
 void syscall_putchar(char ch)
 {
 	msyscall(SYS_putchar, (int)ch, 0, 0, 0, 0);
