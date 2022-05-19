@@ -11,6 +11,7 @@ extern struct Env *env;
 // -E_IPC_NOT_RECV.
 //
 // Hint: use syscall_yield() to be CPU-friendly.
+/*
 void
 ipc_send(u_int whom, u_int val, u_int srcva, u_int perm)
 {
@@ -26,6 +27,11 @@ ipc_send(u_int whom, u_int val, u_int srcva, u_int perm)
 	}
 
 	user_panic("error in ipc_send: %d", r);
+}
+*/
+
+void ipc_send(u_int whom, u_int val, u_int srcva, u_int perm) {
+syscall_ipc_can_send(whom, val, srcva, perm);
 }
 
 // Receive a value.  Return the value and store the caller's envid
