@@ -13,7 +13,7 @@ extern void libmain();
 extern void exit();
 
 extern struct Env *env;
-
+int make_shared(void *va);
 
 #define USED(x) (void)(x)
 //////////////////////////////////////////////////////printf

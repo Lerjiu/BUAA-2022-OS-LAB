@@ -5,6 +5,82 @@
 #include <env.h>
 
 
+int make_shared(void *va)
+{
+//	struct Env *now;
+	int r = 0;
+//	envid2env(0, &now, 0);
+//	struct Pte *pte;
+//	struct page *p;
+//	printf("make shared\n");
+//	writef("make shared\n");
+	u_int perm;
+	perm = ((Pte *)(*vpt))[VPN(va)] & 0xfff;
+	u_int envid = syscall_getenvid();
+
+	if((perm & PTE_V) == 0)
+	{
+		r = syscall_mem_alloc(envid, va, PTE_V | PTE_R);
+		//writef("after alloc\n");
+		if(r) return r;
+	}
+//	writef("after allocn\n");
+	if((u_int)va >=UTOP)
+	{
+		return -1;
+	}
+
+	perm = ((Pte *)(*vpt))[VPN(va)] & 0xfff;
+	if((perm & PTE_V) && ((perm & PTE_R) == 0))
+	{
+		return -1;
+	}
+
+	if((perm & PTE_V) && (perm & PTE_LIBRARY))
+	{
+		return (((Pte *)(*vpt))[VPN(va)]) & 0xfffff000;
+	}
+
+	syscall_mem_map(envid, va, envid, va, perm | PTE_LIBRARY);
+//	writef("after map\n");
+	return (((Pte *)(*vpt))[VPN(va)]) & 0xfffff000;
+
+/*	if(page_lookup(now->env_pgdir, (u_long)va, &pte) == NULL)
+	{
+		r = page_alloc(&p);
+		if(r) return -1;
+		r = page_insert(now->env_pgdir, p, (u_long)va, PTE_R | PTE_LIBRARY);
+		if(r) return -1;
+		
+	}
+
+	if((u_long)va >= UTOP)
+	{
+		return -1;
+	}
+
+	if(page_lookup(now->env_pgdir, (u_long)va, &pte) != NULL)
+	{
+		if((pte & PTE_R) == 0)
+		{
+			return -1;
+		}
+	}
+
+	if(page_lookup(now->env_pgdir, (u_long)va, &pte) != NULL)
+	{
+		if(pte & PTE_LIBRARY)
+		{
+			return va2pa(now->env_pgdir, (u_long)va);
+		}
+	}
+
+	page_lookup(now->env_pgdir, (u_long)va, &pte);
+	syscall_mem_map(0, (u_long)va, 0, (u_long)va, (pte & 0xfff) | PTE_LIBRARY);
+	return va2pa(now->env_pgdir, (u_long)va);
+*/
+}
+
 /* ----------------- help functions ---------------- */
 
 /* Overview:
