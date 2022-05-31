@@ -30,9 +30,45 @@ ide_read(u_int diskno, u_int secno, void *dst, u_int nsecs)
 	int offset_end = offset_begin + nsecs * 0x200;
 	int offset = 0;
 
+	u_int offset_cur;
+	u_int zero = 0;
+
 	while (offset_begin + offset < offset_end) {
 		// Your code here
 		// error occurred, then panic.
+		offset_cur = offset_begin + offset;
+		if(syscall_write_dev((u_int)(&diskno), 0x13000010, 4) < 0)
+		{
+			user_panic("ide_read panic");
+		}
+
+		if(syscall_write_dev((u_int)(&offset_cur), 0x13000000, 4) < 0)
+		{
+			user_panic("ide_read panic");
+		}
+
+		if(syscall_write_dev((u_int)(&zero), 0x13000020, 4) < 0)
+		{
+			user_panic("ide_read panic");
+		}
+
+		u_int ret;
+		if(syscall_read_dev((u_int)(&ret), 0x13000030, 4) < 0)
+		{
+			user_panic("ide_read panic");
+		}
+		
+		if(ret != 0)
+		{
+			user_panic("ide_read panic");
+		}
+
+		if(syscall_read_dev((u_int)(dst + offset), 0x13004000, 0x200) < 0)
+		{
+			user_panic("ide_read panic");
+		}
+
+		offset += 0x200;
 	}
 }
 
@@ -55,9 +91,9 @@ void
 ide_write(u_int diskno, u_int secno, void *src, u_int nsecs)
 {
 	// Your code here
-	// int offset_begin = ;
-	// int offset_end = ;
-	// int offset = ;
+	int offset_begin ;
+	int offset_end ;
+	int offset ;
 
 	// DO NOT DELETE WRITEF !!!
 	writef("diskno: %d\n", diskno);
@@ -67,4 +103,25 @@ ide_write(u_int diskno, u_int secno, void *src, u_int nsecs)
 
 		// if error occur, then panic.
 	// }
+	u_int one = 1;
+	u_int offset_cur = 0;
+
+	while (offset_begin + offset < offset_end)
+	{
+		// copy data from source array to disk buffer.
+		// if error occur, then panic.
+		offset_cur = offset_begin + offset;
+		if (syscall_write_dev((u_int)(src + offset), 0x13004000, 0x200) < 0)
+			user_panic("ide_write panic");
+		if (syscall_write_dev((u_int)&diskno, 0x13000010, 4) < 0)
+			user_panic("ide_write panic");
+		if (syscall_write_dev((u_int)&offset_cur, 0x13000000, 4) < 0)
+			user_panic("ide_write panic");
+		if (syscall_write_dev((u_int)&one, 0x13000020, 4) < 0)
+			user_panic("ide_write panic");
+		u_int ret;
+		if (syscall_read_dev((u_int)&ret, 0x13000030, 4) < 0)
+			user_panic("ide_write panic");
+		offset += 0x200;
+	}
 }
