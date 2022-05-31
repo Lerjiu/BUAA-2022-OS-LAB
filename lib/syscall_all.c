@@ -479,6 +479,7 @@ int sys_read_dev(int sysno, u_int va, u_int dev, u_int len)
        (dev >= 0x15000000 && dev + len <= 0x15000200))
     {
         bcopy(0xa0000000 + dev, va, len);
+//		printcharc('c');
         return 0;
     } else {
         return -E_INVAL;
