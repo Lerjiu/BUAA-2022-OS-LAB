@@ -39,33 +39,33 @@ ide_read(u_int diskno, u_int secno, void *dst, u_int nsecs)
 		offset_cur = offset_begin + offset;
 		if(syscall_write_dev((u_int)(&diskno), 0x13000010, 4) < 0)
 		{
-			user_panic("ide_read panic");
+			user_panic("ide_read panic1");
 		}
 
 		if(syscall_write_dev((u_int)(&offset_cur), 0x13000000, 4) < 0)
 		{
-			user_panic("ide_read panic");
+			user_panic("ide_read panic2");
 		}
 
 		if(syscall_write_dev((u_int)(&zero), 0x13000020, 4) < 0)
 		{
-			user_panic("ide_read panic");
+			user_panic("ide_read panic3");
 		}
 
 		u_int ret;
 		if(syscall_read_dev((u_int)(&ret), 0x13000030, 4) < 0)
 		{
-			user_panic("ide_read panic");
+			user_panic("ide_read panic4");
 		}
 		
-		if(ret != 0)
+		if(ret == 0)
 		{
-			user_panic("ide_read panic");
+			user_panic("ide_read panic5");
 		}
 
 		if(syscall_read_dev((u_int)(dst + offset), 0x13004000, 0x200) < 0)
 		{
-			user_panic("ide_read panic");
+			user_panic("ide_read panic6");
 		}
 
 		offset += 0x200;
