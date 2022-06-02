@@ -6,6 +6,47 @@
 #include "lib.h"
 #include <mmu.h>
 
+int time_read()
+{
+	u_int update;
+	syscall_read_dev((u_int)(&update), 0x15000000, 4);
+	u_int time;
+	syscall_read_dev((u_int)(&time), 0x15000010, 4);
+	return time;
+}
+
+void raid0_write(u_int secno, void *src, u_int nsecs)
+{
+	int i;
+	u_int offset = 0;
+	for(i = secno; i <secno + nsecs; i++)
+	{
+		if((i % 2) == 0)
+		{
+			ide_write(1, i/2, src + offset, 1);
+		} else {
+			ide_write(2, i/2, src + offset, 2);
+		}
+		offset += 0x200;
+	}
+}
+
+void raid0_read(u_int secno, void *dst, u_int nsecs)
+{
+	int i;
+    u_int offset = 0;
+    for(i = secno; i <secno + nsecs; i++)
+    {
+        if((i % 2) == 0)
+        {
+            ide_read(1, i/2, dst + offset, 1);
+        } else {
+            ide_read(2, i/2, dst + offset, 2);
+        }
+        offset += 0x200;
+    }
+}
+
 // Overview:
 // 	read data from IDE disk. First issue a read request through
 // 	disk register and then copy data from disk buffer
