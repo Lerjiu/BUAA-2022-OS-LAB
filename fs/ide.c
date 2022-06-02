@@ -47,6 +47,142 @@ void raid0_read(u_int secno, void *dst, u_int nsecs)
     }
 }
 
+int raid4_valid(u_int diskno)
+{
+	u_int ret;
+	u_int zero = 0;
+
+	syscall_write_dev((u_int)(&diskno), 0x13000010, 4);
+	
+	syscall_write_dev((u_int)(&zero), 0x13000000, 4);
+
+	syscall_write_dev((u_int)(&zero), 0x13000020, 1);
+
+	syscall_read_dev((u_int)(&ret), 0x13000030, 1);
+	if(ret == 0)
+	{
+		return 0;
+	}else{
+		return 1;
+	}
+}
+
+int raid4_write(u_int blockno, void *src)
+{
+	int i;
+	int invalid_num = 0;
+	for(i = 1; i < 5; i++)
+	{
+		if(raid4_valid(i))
+		{
+			ide_write(i, blockno*2, src+(i-1)*0x200, 1);
+			ide_write(i, blockno*2+1, src+(i+3)*0x200, 1);
+		}else{
+			invalid_num++;
+		}
+	}
+	
+	if(!raid4_valid(5))
+	{
+		invalid_num++;
+		return invalid_num;
+	}
+
+	u_int disk5_1[128] = {0};
+	u_int disk5_2[128] = {0};
+	u_int *tmp = NULL;
+	tmp = (u_int*)src;
+	for(i = 0; i < 128; i++)
+	{
+		disk5_1[i] = tmp[i] ^ tmp[128+i] ^ tmp[256+i] ^ tmp[128*3+i];
+		disk5_2[i] = tmp[512+i] ^ tmp[512+128+i] ^ tmp[512+256+i] ^ tmp[512+128*3+i];
+	}
+
+	ide_write(5, blockno*2, (void*)disk5_1, 1);
+	ide_write(5, blockno*2+1, (void*)disk5_2, 1);
+	return invalid_num;
+}
+
+int raid4_read(u_int blockno, void *dst)
+{
+	int invalid_num = 0;
+	int invalid_disk = 0;
+	int i;
+	for(i = 1; i <= 5; i++)
+	{
+		if(!raid4_valid(i))
+		{
+			invalid_num++;
+			invalid_disk = i;
+		}
+	}
+
+	if(invalid_num == 0)
+	{
+		for(i = 1; i < 5; i++)
+		{
+			ide_read(i, blockno*2, dst+(i-1)*0x200, 1);
+            ide_read(i, blockno*2+1, dst+(i+3)*0x200, 1);
+		}
+		u_int disk5_1[128] = {0};
+   		u_int disk5_2[128] = {0};
+    	u_int *tmp = NULL;
+    	tmp = (u_int*)dst;
+    	for(i = 0; i < 128; i++)
+    	{
+        	disk5_1[i] = tmp[i] ^ tmp[128+i] ^ tmp[256+i] ^ tmp[128*3+i];
+        	disk5_2[i] = tmp[512+i] ^ tmp[512+128+i] ^ tmp[512+256+i] ^ tmp[512+128*3+i];
+    	}
+		u_int disk51[128] = {0};
+		u_int disk52[128] = {0};
+		ide_read(5, blockno*2, (void*)disk51, 1);
+		ide_read(5, blockno*2+1, (void*)disk52, 1);
+		
+		for(i = 0; i < 128; i++)
+		{
+			if((disk5_1[i]!=disk51[i]) || (disk5_2[i]!=disk52[i]))
+				return -1;
+		}
+		return 0;
+	}
+
+	if(invalid_num == 1)
+	{
+		if(invalid_disk == 5)
+		{
+			for(i = 1; i < 5; i++)
+        	{
+            	ide_read(i, blockno*2, dst+(i-1)*0x200, 1);
+            	ide_read(i, blockno*2+1, dst+(i+3)*0x200, 1);
+        	}
+		}else{
+			for(i = 1; i < 5; i++)
+            {
+                if(i == invalid_disk) continue;
+                ide_read(i, blockno*2, dst+(i-1)*0x200, 1);
+                ide_read(i, blockno*2+1, dst+(i+3)*0x200, 1);
+            }
+			u_int invalid1[128] = {0};
+			u_int invalid2[128] = {0};
+			u_int valid11[128] = {0};
+			u_int valid12[128] = {0};
+			u_int valid21[128] = {0};
+			u_int valid22[128] = {0};
+			u_int valid31[128] = {0};
+			u_int valid32[128] = {0};
+			u_int valid41[128] = {0};
+			u_int valid42[128] = {0};
+			if(invalid_disk == 1)
+			{
+				
+			}
+		}
+		return 1;
+	}
+	
+	if(invalid_num > 1) return invalid_num;
+}
+
 // Overview:
 // 	read data from IDE disk. First issue a read request through
 // 	disk register and then copy data from disk buffer
