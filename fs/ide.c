@@ -54,9 +54,9 @@ int raid4_valid(u_int diskno)
 
 	syscall_write_dev((u_int)(&diskno), 0x13000010, 4);
 	
-//	syscall_write_dev((u_int)(&zero), 0x13000000, 4);
+	syscall_write_dev((u_int)(&zero), 0x13000000, 4);
 
-//	syscall_write_dev((u_int)(&zero), 0x13000020, 1);
+	syscall_write_dev((u_int)(&zero), 0x13000020, 1);
 
 	syscall_read_dev((u_int)(&ret), 0x13000030, 1);
 	if(ret == 0)
