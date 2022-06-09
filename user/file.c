@@ -37,7 +37,7 @@ open(const char *path, int mode)
 	int r;
 	u_int va;
 	u_int i;
-
+	struct File *file;
 	// Step 1: Alloc a new Fd, return error code when fail to alloc.
 	// Hint: Please use fd_alloc.
 	r = fd_alloc(&fd);
@@ -46,7 +46,13 @@ open(const char *path, int mode)
 	// Step 2: Get the file descriptor of the file to open.
 	// Hint: Read fsipc.c, and choose a function.
 	r = fsipc_open(path, mode, fd);
-	if(r) return r;
+	if(r) {
+		if((r == E_NOT_FOUND) && (mode & O_CREAT)) {
+			file_create(path, &file);
+		} else {
+			return r;
+		}
+	}
 
 	// Step 3: Set the start address storing the file's content. Set size and fileid correctly.
 	// Hint: Use fd2data to get the start address.
@@ -65,8 +71,8 @@ open(const char *path, int mode)
 			return r;
 	}
 	int fdnum = fd2num(fd);
-//	if (mode & O_APPND)
-//		seek(fdnum, size);
+	if (mode & O_APPND)
+		seek(fdnum, size);
 	return fdnum;
 
 	// Step 5: Return the number of file descriptor.
