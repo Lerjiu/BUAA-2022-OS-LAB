@@ -47,11 +47,7 @@ open(const char *path, int mode)
 	// Hint: Read fsipc.c, and choose a function.
 	r = fsipc_open(path, mode, fd);
 	if(r) {
-		if((r == E_NOT_FOUND) && (mode & O_CREAT)) {
-			file_create(path, &file);
-		} else {
-			return r;
-		}
+		return r;
 	}
 
 	// Step 3: Set the start address storing the file's content. Set size and fileid correctly.
@@ -71,7 +67,7 @@ open(const char *path, int mode)
 			return r;
 	}
 	int fdnum = fd2num(fd);
-	if (mode & O_APPND)
+	if (mode & O_APPEND)
 		seek(fdnum, size);
 	return fdnum;
 
