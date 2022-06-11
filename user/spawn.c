@@ -137,6 +137,45 @@ int spawn(char *prog, char **argv)
 	//        Maybe you can review lab3 
 	// Your code ends here
 
+	fd = r;
+	if((r = readn(fd, elfbuf, sizeof()Elf32_Ehdr) < 0))
+		return r;
+
+	elf = (Elf32_Ehdr*)elfbuf;
+
+	if(!usr_is_elf_format(elf) || elf->e_type != EI_MAG2)
+		return -E_INVAL;
+
+	if((r = syscall_env_alloc()) < 0)
+		return r;
+
+	if(r == 0) {
+		env = envs + ENVX(syscall_getenvid());
+		return 0;
+	}
+
+	child_envid = r;
+
+	init_stack(child_envid, argv, &esp);
+
+	text_start = elf->phoff;
+	size = elf->phentsize;
+	for(i = 0; i < elf->e_phnum; i++) {
+		if((r = seek(fd, text_start)) < 0)
+			return r;
+
+		if((r = readn(fd, elfbuf, size)) < 0)
+			return r;
+
+		ph = (Elf32_Phdr*)elfbuf;
+		if(ph->p_type == PT_LOAD) {
+			if((r = usr_load_elf(fd, ph, child_envid)) < 0)
+				return r;
+		}
+
+		text_start += size;
+	}
+
 	struct Trapframe *tf;
 	writef("\n::::::::::spawn size : %x  sp : %x::::::::\n",size,esp);
 	tf = &(envs[ENVX(child_envid)].env_tf);
