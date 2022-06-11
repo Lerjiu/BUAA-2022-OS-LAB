@@ -105,12 +105,11 @@ usr_load_elf(int fd , Elf32_Phdr *ph, int child_envid){
     u_long va = ph->p_vaddr;
     u_int32_t sgsize = ph->p_memsz;
     u_int32_t bin_size = ph->p_filesz;
-    u_char bin[BY2PG];
+    u_char *bin;
     u_long i;
     int r;
     u_long offset = va - ROUNDDOWN(va, BY2PG);
-
-    r = read_map(fd, offset, &bin);
+    r = read_map(fd, ph->p_offset, &bin);
     if (r < 0) return r;
     if (offset != 0)
     {
@@ -138,7 +137,6 @@ usr_load_elf(int fd , Elf32_Phdr *ph, int child_envid){
             return r;
         i += BY2PG;
     }
-
 	return 0;
 }
 
@@ -180,7 +178,7 @@ int spawn(char *prog, char **argv)
 
 	elf = (Elf32_Ehdr*)elfbuf;
 
-	if(!usr_is_elf_format(elf) || elf->e_type != EI_MAG2)
+	if(!usr_is_elf_format(elf) || elf->e_type != 2)
 		return -E_INVAL;
 
 	if((r = syscall_env_alloc()) < 0)
