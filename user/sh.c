@@ -138,7 +138,8 @@ again:
 			//		goto runit, to execute this piece of the pipeline
 			//			and then wait for the right side to finish
 			pipe(p);
-			if((rightpipe = fork()) == 0) {
+            rightpipe = fork();
+			if(rightpipe == 0) {
 				dup(p[0], 0);
 				close(p[0]);
 				close(p[1]);
