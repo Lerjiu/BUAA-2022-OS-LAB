@@ -125,7 +125,6 @@ again:
 			fd = r;
 			dup(fd, 1);
 			close(fd);
-			//user_panic("> redirection not implemented");
 			break;
 		case '|':
 			// Your code here.
