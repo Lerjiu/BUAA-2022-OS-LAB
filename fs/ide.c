@@ -47,13 +47,13 @@ ide_read(u_int diskno, u_int secno, void *dst, u_int nsecs)
 			user_panic("ide_read panic2");
 		}
 
-		if(syscall_write_dev((u_int)(&zero), 0x13000020, 1) < 0)
+		if(syscall_write_dev((u_int)(&zero), 0x13000020, 4) < 0)
 		{
 			user_panic("ide_read panic3");
 		}
 
 		u_int ret;
-		if(syscall_read_dev((u_int)(&ret), 0x13000030, 1) < 0)
+		if(syscall_read_dev((u_int)(&ret), 0x13000030, 4) < 0)
 		{
 			user_panic("ide_read panic4");
 		}
@@ -122,12 +122,12 @@ ide_write(u_int diskno, u_int secno, void *src, u_int nsecs)
 		{
 			user_panic("ide_write error!");
 		}
-		if (syscall_write_dev((u_int)&write_value, dev_addr + 0x20, 1) < 0)
+		if (syscall_write_dev((u_int)&write_value, dev_addr + 0x20, 4) < 0)
 		{
 			user_panic("ide_write error!");
 		}
 		status = 0;
-		if (syscall_read_dev((u_int)&status, dev_addr + 0x30, 1) < 0)
+		if (syscall_read_dev((u_int)&status, dev_addr + 0x30, 4) < 0)
 		{
 			user_panic("ide_write error!");
 		}
