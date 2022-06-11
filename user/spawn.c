@@ -149,10 +149,10 @@ int spawn(char *prog, char **argv)
 	if((r = syscall_env_alloc()) < 0)
 		return r;
 
-	if(r == 0) {
-		env = envs + ENVX(syscall_getenvid());
-		return 0;
-	}
+//	if(r == 0) {
+//		env = envs + ENVX(syscall_getenvid());
+//		return 0;
+//	}
 
 	child_envid = r;
 

@@ -106,21 +106,19 @@ again:
 			}
 			// Your code here -- open t for reading,
 			// dup it onto fd 0, and then close the fd you got.
-			r = open(t, O_RDONLY);
-			if(r < 0) user_panic(" < open failed");
-			fd = r;
-			dup(fd, 0);
-			close(fd);
+			fdnum = open(t, O_RDONLY);
+//			if(r < 0) user_panic(" < open failed");
+			dup(fdnum, 0);
+			close(fdnum);
 			//user_panic("< redirection not implemented");
 			break;
 		case '>':
 			// Your code here -- open t for writing,
 			// dup it onto fd 1, and then close the fd you got.
-			r = open(t, O_WRONLY);
-			if(r < 0) user_panic(" > open failed");
-			fd = r;
-			dup(fd, 1);
-			close(fd);
+			fdnum = open(t, O_WRONLY);
+//			if(r < 0) user_panic(" > open failed");
+			dup(fdnum, 1);
+			close(fdnum);
 			//user_panic("> redirection not implemented");
 			break;
 		case '|':
