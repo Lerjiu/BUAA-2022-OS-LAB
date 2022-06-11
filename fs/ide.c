@@ -25,51 +25,31 @@
 void
 ide_read(u_int diskno, u_int secno, void *dst, u_int nsecs)
 {
-	// 0x200: the size of a sector: 512 bytes.
-	int offset_begin = secno * 0x200;
-	int offset_end = offset_begin + nsecs * 0x200;
-	int offset = 0;
+    // 0x200: the size of a sector: 512 bytes.
+    int offset_begin = secno * 0x200;
+    int offset_end = offset_begin + nsecs * 0x200;
+    int offset = 0;
+    int read = 0;
 
-	u_int offset_cur;
-	u_int zero = 0;
-
-	while (offset_begin + offset < offset_end) {
-		// Your code here
-		// error occurred, then panic.
-		offset_cur = offset_begin + offset;
-		if(syscall_write_dev((u_int)(&diskno), 0x13000010, 4) < 0)
-		{
-			user_panic("ide_read panic1");
-		}
-
-		if(syscall_write_dev((u_int)(&offset_cur), 0x13000000, 4) < 0)
-		{
-			user_panic("ide_read panic2");
-		}
-
-		if(syscall_write_dev((u_int)(&zero), 0x13000020, 4) < 0)
-		{
-			user_panic("ide_read panic3");
-		}
-
-		u_int ret;
-		if(syscall_read_dev((u_int)(&ret), 0x13000030, 4) < 0)
-		{
-			user_panic("ide_read panic4");
-		}
-		
-		if(ret == 0)
-		{
-			user_panic("ide_read panic5");
-		}
-
-		if(syscall_read_dev((u_int)(dst + offset), 0x13004000, 0x200) < 0)
-		{
-			user_panic("ide_read panic6");
-		}
-
-		offset += 0x200;
-	}
+    while (offset_begin + offset < offset_end) {
+        // Your code here
+        u_int cur_offset = offset_begin + offset;
+        if (syscall_write_dev((u_int)&diskno, 0x13000010, 4) < 0)
+            user_panic("ide_read set IDE ID panic");
+        if (syscall_write_dev((u_int)&cur_offset, 0x13000000, 4) < 0)
+            user_panic("ide_read set offset panic");
+        if (syscall_write_dev((u_int)&read, 0x13000020, 4) < 0)
+            user_panic("ide_read set read mod panic");
+        int ret;
+        if (syscall_read_dev((u_int)&ret, 0x13000030, 4) < 0)
+            user_panic("ide_read get ide status panic");
+        if (ret == 0)
+            user_panic("ide_read read fail panic");
+        if (syscall_read_dev((u_int)(dst + offset), 0x13004000, 0x200) < 0)
+            user_panic("ide_read get data panic");
+        offset += 0x200;
+        // error occurred, then panic.
+    }
 }
 
 
@@ -90,51 +70,31 @@ ide_read(u_int diskno, u_int secno, void *dst, u_int nsecs)
 void
 ide_write(u_int diskno, u_int secno, void *src, u_int nsecs)
 {
-	// Your code here
-
-	// DO NOT DELETE WRITEF !!!
-	writef("diskno: %d\n", diskno);
-
-	// while ( < ) {
-		// copy data from source array to disk buffer.
-
-		// if error occur, then panic.
-	u_int offset_begin = secno * 0x200;
-	u_int offset_end = offset_begin + nsecs * 0x200;
-	u_int offset = 0;
-	u_int dev_addr = 0x13000000;
-	u_char status = 0;
-	u_char write_value = 1;
-
-	writef("diskno: %d\n", diskno);
-
-	while (offset_begin + offset < offset_end) {
-		u_int now_offset = offset_begin + offset;
-		if (syscall_write_dev((u_int)&diskno, dev_addr + 0x10, 4) < 0)
-		{
-			user_panic("ide_write error!");
-		}
-		if (syscall_write_dev((u_int)&now_offset, dev_addr + 0x0, 4) < 0)
-		{
-			user_panic("ide_write error!");
-		}
-		if (syscall_write_dev((u_int)(src + offset), dev_addr + 0x4000, 0x200) < 0)
-		{
-			user_panic("ide_write error!");
-		}
-		if (syscall_write_dev((u_int)&write_value, dev_addr + 0x20, 4) < 0)
-		{
-			user_panic("ide_write error!");
-		}
-		status = 0;
-		if (syscall_read_dev((u_int)&status, dev_addr + 0x30, 4) < 0)
-		{
-			user_panic("ide_write error!");
-		}
-		if (status == 0)
-		{
-			user_panic("ide write faild!");
-		}
-		offset += 0x200;
-	}
+    // Your code here
+    int offset_begin = secno * 0x200;
+    int offset_end = offset_begin + nsecs * 0x200;
+    int offset = 0;
+    int write = 1;
+    // DO NOT DELETE WRITEF !!!
+    writef("diskno: %d\n", diskno);
+    while (offset_begin + offset < offset_end)
+    {
+        // copy data from source array to disk buffer.
+        // if error occur, then panic.
+        u_int cur_offset = offset_begin + offset;
+        if (syscall_write_dev((u_int)(src + offset), 0x13004000, 0x200) < 0)
+            user_panic("ide_write set data panic");
+        if (syscall_write_dev((u_int)&diskno, 0x13000010, 4) < 0)
+            user_panic("ide_write set IDE ID panic");
+        if (syscall_write_dev((u_int)&cur_offset, 0x13000000, 4) < 0)
+            user_panic("ide_write set offset panic");
+        if (syscall_write_dev((u_int)&write, 0x13000020, 4) < 0)
+            user_panic("ide_write set write mod panic");
+        int ret;
+        if (syscall_read_dev((u_int)&ret, 0x13000030, 4) < 0)
+            user_panic("ide_write get status panic");
+        if (ret == 0)
+            user_panic("ide_write write fail panic");
+        offset += 0x200;
+    }
 }
