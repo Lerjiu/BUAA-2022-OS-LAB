@@ -134,7 +134,7 @@ piperead(struct Fd *fd, void *vbuf, u_int n, u_int offset)
 	
 	for(i = 0; i < n; i++) {
 		while(p->p_rpos == p->p_wpos) {
-			if(i > 0 || _ippeisclosed(fd, p)) {
+			if(i > 0 || _pipeisclosed(fd, p)) {
 				return i;
 			}
 			syscall_yield();

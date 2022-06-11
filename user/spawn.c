@@ -138,7 +138,7 @@ int spawn(char *prog, char **argv)
 	// Your code ends here
 
 	fd = r;
-	if((r = readn(fd, elfbuf, sizeof()Elf32_Ehdr) < 0))
+	if((r = readn(fd, elfbuf, sizeof(Elf32_Ehdr))) < 0)
 		return r;
 
 	elf = (Elf32_Ehdr*)elfbuf;
@@ -158,8 +158,8 @@ int spawn(char *prog, char **argv)
 
 	init_stack(child_envid, argv, &esp);
 
-	text_start = elf->phoff;
-	size = elf->phentsize;
+	text_start = elf->e_phoff;
+	size = elf->e_phentsize;
 	for(i = 0; i < elf->e_phnum; i++) {
 		if((r = seek(fd, text_start)) < 0)
 			return r;
