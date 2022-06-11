@@ -10,7 +10,6 @@ void umain()
 	u_int cons = 0x10000000;
 	writef("console test, please input a string:\n");
 	while(1){
-//	writef("before syscall read dev\n");
 		syscall_read_dev(&c, cons, 1);
 		if(c == '\r')
 			break;
@@ -19,7 +18,6 @@ void umain()
 		}
 	}
 	buf[i++] = '\n';
-//	writef("before syscall write dev\n");
 	syscall_write_dev(buf, cons, i);
 	writef("end of devtst\n");
 	

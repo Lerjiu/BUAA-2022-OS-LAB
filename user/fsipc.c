@@ -123,7 +123,7 @@ fsipc_dirty(u_int fileid, u_int offset)
 }
 
 // Overview:
-//	Ask the file server to delete a file, given its pathname.
+//	Ask the file server to delete a file,ngiven its pathname.
 /*** exercise 5.10 ***/
 int
 fsipc_remove(const char *path)

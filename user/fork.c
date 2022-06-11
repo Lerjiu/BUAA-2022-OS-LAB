@@ -66,6 +66,27 @@ void user_bzero(void *v, u_int n)
 }
 /*--------------------------------------------------------------*/
 
+void print_perm(int perm) {
+	writef("perm: ");
+	if (perm & PTE_V) {
+		writef("PTE_V ");
+	}
+
+	if (perm & PTE_R) {
+		writef("PTE_R ");
+	}
+
+	if (perm & PTE_COW) {
+		writef("PTE_COW ");	
+	}
+
+	if (perm & PTE_LIBRARY) {
+		writef("PTE_LIBRARY ");
+	}
+
+	writef("\n");
+}
+
 /* Overview:
  * 	Custom page fault handler - if faulting page is copy-on-write,
  * map in our own private writable copy.
@@ -82,20 +103,23 @@ void user_bzero(void *v, u_int n)
 static void
 pgfault(u_int va)
 {
-	u_int *tmp = USTACKTOP;
-	//	writef("fork.c:pgfault():\t va:%x\n",va);
+	u_int *tmp;
+//	writef("fork.c:pgfault() is called:\t va:%x\n",va);
 	u_int perm = ((Pte *)(*vpt))[VPN(va)] & 0xfff;
-	if((perm & PTE_COW) == 0)
-		user_panic("pgfault err: COW not found");
-
+//	print_perm(perm);
+	if (!(perm & PTE_COW)) {
+		print_perm(perm);
+		user_panic("pgfault: COW not found\n");
+	}
+//	writef("have cow\n");
 	perm -= PTE_COW;
-	syscall_mem_alloc(0, tmp, perm);
 	//map the new page at a temporary place
-
+	tmp = USTACKTOP;
+	syscall_mem_alloc(0, tmp, perm);
 	//copy the content
-	user_bcopy(ROUNDDOWN(va, BY2PG), tmp, BY2PG);
+	user_bcopy(ROUNDDOWN(va, BY2PG), (void*)tmp, BY2PG);
 	//map the page on the appropriate place
-	syscall_mem_map(0, tmp, 0, va, perm);
+    syscall_mem_map(0, tmp, 0, va, perm);
 	//unmap the temporary place
 	syscall_mem_unmap(0, tmp);
 }
@@ -120,19 +144,18 @@ pgfault(u_int va)
 static void
 duppage(u_int envid, u_int pn)
 {
-	u_int addr = pn << PGSHIFT;
-	u_int perm = ((Pte *)(*vpt))[pn] & 0xfff;
-
+	u_int addr;
+	u_int perm;
+	addr = pn << 12; // pagenum * 1024 * 4
+	perm = ((Pte*)(*vpt))[pn] & 0xfff;
 	int flag = 0;
-	if ((perm & PTE_R) && !(perm & PTE_LIBRARY))
-	{
+	if ((perm & PTE_R) && !(perm & PTE_LIBRARY)) {
 		perm |= PTE_COW;
 		flag = 1;
 	}
 	syscall_mem_map(0, addr, envid, addr, perm);
-	if (flag)
-		syscall_mem_map(0, addr, 0, addr, perm);
-	
+	if (flag) syscall_mem_map(0, addr, 0, addr, perm);
+
 	//	user_panic("duppage not implemented");
 }
 
@@ -155,26 +178,28 @@ fork(void)
 	extern struct Env *envs;
 	extern struct Env *env;
 	u_int i;
-	
-	set_pgfault_handler(pgfault);
-	
-	newenvid = syscall_env_alloc();
-	if(newenvid == 0)
-	{
-		env = envs + ENVX(syscall_getenvid());
-		return 0;
-	}
-	//The parent installs pgfault using set_pgfault_handler
 
+
+	//The parent installs pgfault using set_pgfault_handler
+	set_pgfault_handler(pgfault);	
+//	writef("set_pgfault_handler\n");	
 	//alloc a new alloc
-	for(i = 0; i < VPN(USTACKTOP); i++)
-	{
-		if(((*vpd)[i>>10] & PTE_V) && ((*vpt)[i] & PTE_V))
-			duppage(newenvid, i);
+	newenvid = syscall_env_alloc();
+//	writef("syscall_env_alloc\n");
+//	writef("newenvid: %d\n", newenvid);
+	if (newenvid == 0) {
+		env = envs + ENVX(syscall_getenvid());
+	} else {
+		for (i = 0; i < USTACKTOP; i += BY2PG) {
+			if (((*vpd)[VPN(i) >> 10] & PTE_V) && ((*vpt)[VPN(i)] & PTE_V))
+			duppage(newenvid, VPN(i));
+		}
+//		writef("duppage\n");
+		syscall_mem_alloc(newenvid, UXSTACKTOP - BY2PG, PTE_V | PTE_R);
+		syscall_set_pgfault_handler(newenvid, __asm_pgfault_handler, UXSTACKTOP);
+		syscall_set_env_status(newenvid, ENV_RUNNABLE);
 	}
-	syscall_mem_alloc(newenvid, UXSTACKTOP - BY2PG, PTE_V | PTE_R);
-	syscall_set_pgfault_handler(newenvid, __asm_pgfault_handler, UXSTACKTOP);
-	syscall_set_env_status(newenvid, ENV_RUNNABLE);
+//	writef("fork\n");
 	return newenvid;
 }
 
@@ -185,5 +210,3 @@ sfork(void)
 	user_panic("sfork not implemented");
 	return -E_INVAL;
 }
-
-

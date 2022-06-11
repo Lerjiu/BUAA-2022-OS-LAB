@@ -11,14 +11,12 @@ umain(void)
 	if ((who = fork()) != 0) {
 		// get the ball rolling
 		writef("\n@@@@@send 0 from %x to %x\n", syscall_getenvid(), who);
-//		writef("\nbefore ipc_send1\n");
 		ipc_send(who, 0, 0, 0);
 		//user_panic("&&&&&&&&&&&&&&&&&&&&&&&&m");
 	}
 
 	for (;;) {
 		writef("%x am waiting.....\n", syscall_getenvid());
-//		writef("\nbefore ipc_recv\n");
 		i = ipc_recv(&who, 0, 0);
 
 		writef("%x got %d from %x\n", syscall_getenvid(), i, who);
@@ -30,13 +28,11 @@ umain(void)
 
 		i++;
 		writef("\n@@@@@send %d from %x to %x\n",i, syscall_getenvid(), who);
-//		writef("\nbefore ipc_send2\n");
 		ipc_send(who, i, 0, 0);
 
 		if (i == 10) {
 			return;
 		}
-		//writef("\n%x\n",i);
 	}
 
 }

@@ -105,23 +105,24 @@ again:
 				exit();
 			}
 			// Your code here -- open t for reading,
+			fdnum = open(t, O_RDONLY);
+			dup(fdnum, 0);
+			close(fdnum);
 			// dup it onto fd 0, and then close the fd you got.
-			r = open(t, O_RDONLY);
-			if(r < 0) user_panic(" < open failed");
-			fd = r;
-			dup(fd, 0);
-			close(fd);
-			//user_panic("< redirection not implemented");
+//			user_panic("< redirection not implemented");
 			break;
 		case '>':
+			if(gettoken(0, &t) != 'w'){
+				writef("syntax error: > not followed by word\n");
+				exit();
+			}
+
 			// Your code here -- open t for writing,
+			fdnum = open(t, O_WRONLY);
+			dup(fdnum, 1);
+			close(fdnum);
 			// dup it onto fd 1, and then close the fd you got.
-			r = open(t, O_WRONLY);
-			if(r < 0) user_panic(" > open failed");
-			fd = r;
-			dup(fd, 1);
-			close(fd);
-			//user_panic("> redirection not implemented");
+//			user_panic("> redirection not implemented");
 			break;
 		case '|':
 			// Your code here.
@@ -140,7 +141,8 @@ again:
 			//		goto runit, to execute this piece of the pipeline
 			//			and then wait for the right side to finish
 			pipe(p);
-			if((rightpipe = fork()) == 0) {
+			rightpipe = fork();
+			if (rightpipe == 0) {
 				dup(p[0], 0);
 				close(p[0]);
 				close(p[1]);
@@ -151,7 +153,7 @@ again:
 				close(p[0]);
 				goto runit;
 			}
-			//user_panic("| not implemented");
+//			user_panic("| not implemented");
 			break;
 		}
 	}

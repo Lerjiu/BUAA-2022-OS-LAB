@@ -144,11 +144,6 @@ dup(int oldfdnum, int newfdnum)
 	ova = fd2data(oldfd);
 	nva = fd2data(newfd);
 
-//	if ((r = syscall_mem_map(0, (u_int)oldfd, 0, (u_int)newfd,
-//							 ((*vpt)[VPN(oldfd)]) & (PTE_V | PTE_R | PTE_LIBRARY))) < 0) {
-//		goto err;
-//	}
-
 	if ((* vpd)[PDX(ova)]) {
 		for (i = 0; i < PDMAP; i += BY2PG) {
 			pte = (* vpt)[VPN(ova + i)];
@@ -164,9 +159,9 @@ dup(int oldfdnum, int newfdnum)
 	}
 
 	if ((r = syscall_mem_map(0, (u_int)oldfd, 0, (u_int)newfd,
-                             ((*vpt)[VPN(oldfd)]) & (PTE_V | PTE_R | PTE_LIBRARY))) < 0) {
-        goto err;
-    }
+							 ((*vpt)[VPN(oldfd)]) & (PTE_V | PTE_R | PTE_LIBRARY))) < 0) {
+		goto err;
+	}
 
 	return newfdnum;
 
@@ -179,7 +174,6 @@ err:
 
 	return r;
 }
-
 // Overview:
 //	Read 'n' bytes from 'fd' at the current seek position into 'buf'.
 //
@@ -197,36 +191,25 @@ read(int fdnum, void *buf, u_int n)
 
 	// Similar to 'write' function.
 	// Step 1: Get fd and dev.
-	
-	// Step 2: Check open mode.
-
-	// Step 3: Read starting from seek position.
-
-	// Step 4: Update seek position and set '\0' at the end of buf.
-		if ((r = fd_lookup(fdnum, &fd)) < 0 || (r = dev_lookup(fd->fd_dev_id, &dev)) < 0)
-	{
+	if ((r = fd_lookup(fdnum, &fd)) < 0
+			|| (r = dev_lookup(fd->fd_dev_id, &dev)) < 0) {
 		return r;
 	}
-
-	if ((fd->fd_omode & O_ACCMODE) == O_WRONLY)
-	{
+	// Step 2: Check open mode.
+	if ((fd->fd_omode & O_ACCMODE) == O_WRONLY) {
 		writef("[%08x] read %d -- bad mode\n", env->env_id, fdnum);
 		return -E_INVAL;
 	}
-
-	if (debug)
-		writef("read %d %p %d via dev %s\n",
-			   fdnum, buf, n, dev->dev_name);
-
+	// Step 3: Read starting from seek position.
+	if (debug)	writef("read %d %p %d via dev %s\n",
+							fdnum, buf, n, dev->dev_name);
 	r = (*dev->dev_read)(fd, buf, n, fd->fd_offset);
-
-	if (r > 0)
-	{
+	                            
+	if (r > 0) {
 		fd->fd_offset += r;
 	}
-
+	// Step 4: Update seek position and set '\0' at the end of buf.
 	((char *)buf)[r] = '\0';
-
 	return r;
 }
 
