@@ -125,6 +125,24 @@ int	delete(const char *path);
 int	ftruncate(int fd, u_int size);
 int	sync(void);
 
+// pthread.c
+int 	pthread_create(pthread_t * thread, const pthread_attr_t * attr, void * (*start_routine)(void *), void * arg);
+void 	pthread_exit(void *value_ptr);
+int 	pthread_cancel(pthread_t thread);
+int	pthread_setcancelstate(int state, int *oldvalue);
+int	pthread_setcanceltype(int type, int *oldvalue);
+void	pthread_testcancel(void);
+int 	pthread_detach(pthread_t thread);
+int	pthread_join(pthread_t thread, void **value_ptr);
+
+// sem.c
+int	sem_init(sem_t *sem,int shared,unsigned int value);
+int 	sem_destroy(sem_t *sem);
+int 	sem_wait(sem_t *sem);
+int	sem_trywait(sem_t *sem);
+int	sem_post(sem_t *sem);
+int 	sem_getvalue(sem_t *sem, int *valp);
+
 #define user_assert(x)	\
 	do {	if (!(x)) user_panic("assertion failed: %s", #x); } while (0)
 
