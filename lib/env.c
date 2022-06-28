@@ -574,7 +574,7 @@ extern void lcontext(u_int contxt);
  */
 /*** exercise 3.10 ***/
 void
-env_run(struct Env *e)
+env_run(struct Tcb *t)
 {
     /* Step 1: save register state of curenv. */
     /* Hint: if there is an environment running, 
