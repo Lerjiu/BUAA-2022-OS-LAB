@@ -10,12 +10,13 @@ void *run(void *arg) {
     writef("run a thread\n");
     while (1) {
         if (count == 10) {
+            writef("count is 10 and new thread break");
             break;
         }
         count++;
         shared++;
         *((int*)arg) += 1;
-        writef("new thread:0x%x count:%d arg:%d shared:%d",syscall_getthreadid(), count, *((int*)arg), shared);
+        writef("new thread:0x%x count:%d arg:%d shared:%d\n",syscall_getthreadid(), count, *((int*)arg), shared);
     }
 }
 
@@ -31,12 +32,13 @@ void umain() {
     if (!r) {
         while (1) {
             if (count == 10) {
+                writef("count is 10 and umain thread break");
                 break;
             }
             count++;
             shared++;
             arg++;
-            writef("umain thread:0x%x count:%d arg:%d shared:%d", syscall_getthreadid(), count, arg, shared);
+            writef("umain thread:0x%x count:%d arg:%d shared:%d\n", syscall_getthreadid(), count, arg, shared);
         }
     }
 }
