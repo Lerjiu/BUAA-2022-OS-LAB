@@ -70,7 +70,7 @@ u_int sys_getthreadid(void)
  * Post-Condition:
  * 	Deschedule current environment. This function will never return.
  */
-/*** exercise 4.6 ***/
+
 void sys_yield(void)
 {
     bcopy((void *)KERNEL_SP - sizeof(struct Trapframe),
@@ -143,7 +143,7 @@ int sys_thread_destroy(int sysno, u_int threadid)
  * 	exception stack will be set to `xstacktop`.
  * 	Returns 0 on success, < 0 on error.
  */
-/*** exercise 4.12 ***/
+
 int sys_set_pgfault_handler(int sysno, u_int envid, u_int func, u_int xstacktop)
 {
     // Your code here.
@@ -175,7 +175,7 @@ int sys_set_pgfault_handler(int sysno, u_int envid, u_int func, u_int xstacktop)
  *	- va must be < UTOP
  *	- env may modify its own address space or the address space of its children
  */
-/*** exercise 4.3 ***/
+
 int sys_mem_alloc(int sysno, u_int envid, u_int va, u_int perm)
 {
     // Your code here.
@@ -216,7 +216,7 @@ int sys_mem_alloc(int sysno, u_int envid, u_int va, u_int perm)
  * Note:
  * 	Cannot access pages above UTOP.
  */
-/*** exercise 4.4 ***/
+
 int sys_mem_map(int sysno, u_int srcid, u_int srcva, u_int dstid, u_int dstva, u_int perm)
 {
     int ret;
@@ -258,7 +258,7 @@ int sys_mem_map(int sysno, u_int srcid, u_int srcva, u_int dstid, u_int dstva, u
  *
  * Cannot unmap pages above UTOP.
  */
-/*** exercise 4.5 ***/
+
 int sys_mem_unmap(int sysno, u_int envid, u_int va)
 {
     // Your code here.
@@ -286,7 +286,7 @@ int sys_mem_unmap(int sysno, u_int envid, u_int va)
  * 	In the child, the register set is tweaked so sys_env_alloc returns 0.
  * 	Returns envid of new environment, or < 0 on error.
  */
-/*** exercise 4.8 ***/
+
 int sys_env_alloc(void)
 {
     // Your code here.
@@ -350,7 +350,7 @@ int sys_thread_alloc(void)
  * 	Return -E_INVAL if status is not a valid status for an environment.
  * 	The status of environment will be set to `status` on success.
  */
-/*** exercise 4.14 ***/
+
 int sys_set_env_status(int sysno, u_int envid, u_int status)
 {
     // Your code here.
@@ -439,14 +439,19 @@ void sys_panic(int sysno, char *msg)
  * 	This syscall will set the current process's status to
  * ENV_NOT_RUNNABLE, giving up cpu.
  */
-/*** exercise 4.7 ***/
+
 void sys_ipc_recv(int sysno, u_int dstva)
 {
-    if(dstva >= UTOP)
-        return;
+    if (dstva >= UTOP)
+        sys_yield();
+    if (curenv->env_ipc_recving == 1)
+        sys_yield();
     curenv->env_ipc_recving = 1;
+    curenv->env_ipc_waiting_thread_no = curtcb->thread_id & 0x7;
     curenv->env_ipc_dstva = dstva;
-    curenv->env_status = ENV_NOT_RUNNABLE;
+    if (curtcb->tcb_status == ENV_RUNNABLE)
+        LIST_REMOVE(curtcb,tcb_sched_link);
+    curtcb->tcb_status = ENV_NOT_RUNNABLE;
     sys_yield();
 }
 
@@ -467,34 +472,32 @@ void sys_ipc_recv(int sysno, u_int dstva)
  *
  * Hint: the only function you need to call is envid2env.
  */
-/*** exercise 4.7 ***/
-int sys_ipc_can_send(int sysno, u_int envid, u_int value, u_int srcva, u_int perm)
+
+int sys_ipc_can_send(int sysno, u_int envid, u_int value, u_int srcva,
+                     u_int perm)
 {
+
     int r;
     struct Env *e;
+    struct Tcb *t;
     struct Page *p;
-
-    if(srcva >= UTOP)
-        return -E_INVAL;
-
     r = envid2env(envid, &e, 0);
-    if(r < 0) return r;
-
-    if(e->env_ipc_recving == 0)
+    if (r)
+        return r;
+    if (!e->env_ipc_recving)
         return -E_IPC_NOT_RECV;
-
+    t = &e->env_threads[e->env_ipc_waiting_thread_no];
     e->env_ipc_value = value;
-    e->env_ipc_from = curenv->env_id;
     e->env_ipc_recving = 0;
     e->env_ipc_perm = perm;
-    e->env_status = ENV_RUNNABLE;
-    if(srcva != 0) {
-        p = page_lookup(curenv->env_pgdir, srcva, NULL);
-        if((p == NULL) || (e->env_ipc_dstva >= UTOP))
-            return -E_INVAL;
-        r = page_insert(e->env_pgdir, p, e->env_ipc_dstva, perm);
-        if(r) return r;
+    e->env_ipc_from = curenv->env_id;
+    if (srcva != 0) {
+        r = sys_mem_map(sysno,curenv->env_id,srcva,e->env_id,e->env_ipc_dstva,perm);
+        if (r)
+            return r;
     }
+    t->tcb_status = ENV_RUNNABLE;
+    LIST_INSERT_HEAD(tcb_sched_list, t, tcb_sched_link);
     return 0;
 }
 
