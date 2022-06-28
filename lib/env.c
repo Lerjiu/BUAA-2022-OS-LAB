@@ -419,7 +419,6 @@ load_icode(struct Env *e, u_char *binary, u_int size)
 		return;
 	
 
-    /***Your Question Here***/
 	e->env_threads[0].tcb_status = ENV_RUNNABLE;
 	LIST_INSERT_HEAD(tcb_sched_list,&e->env_threads[0],tcb_sched_link);
 	//LIST_INSERT_HEAD(env_sched_list, e, env_sched_link);
@@ -541,7 +540,7 @@ env_destroy(struct Env *e)
 		bcopy((void *)KERNEL_SP - sizeof(struct Trapframe),
 			  (void *)TIMESTACK - sizeof(struct Trapframe),
 			  sizeof(struct Trapframe));
-		printf("i am killed ... \n");
+		printf("i am killed 0x%x \n", e->env_id);
 		sched_yield();
 	}
 }
@@ -555,7 +554,7 @@ void thread_destroy(struct Tcb *t) {
 		bcopy((void *)KERNEL_SP - sizeof(struct Trapframe),
 			(void *)TIMESTACK - sizeof(struct Trapframe),
 			sizeof(struct Trapframe));
-		printf("i am thread, i am killed ... \n");
+		printf("i am thread, i am killed 0x%x \n", t->thread_id);
 		sched_yield();
 	}
 }
