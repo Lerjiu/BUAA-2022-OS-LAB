@@ -105,7 +105,7 @@ int envid2env(u_int envid, struct Env **penv, int checkperm)
 	
 	e = &envs[ENVX(envid)];
 
-    if (e->env_status == ENV_FREE || e->env_id != envid) {
+    if (e->env_id != envid) {
         *penv = 0;
         return -E_BAD_ENV;
     }
@@ -175,7 +175,7 @@ env_init(void)
 	for(i=NENV-1; i>=0; i--)
 	{
 		e = envs + i;
-		e->env_status = ENV_FREE;
+//		e->env_status = ENV_FREE;
 		LIST_INSERT_HEAD(&env_free_list, e, env_link);
 	}
 }
