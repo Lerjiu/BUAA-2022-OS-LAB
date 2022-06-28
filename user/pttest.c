@@ -3,6 +3,7 @@
 //
 
 #include <lib.h>
+#include "../include/types.h"
 int shared = 0;
 void *run(void *arg) {
     int count = 0;
@@ -25,7 +26,8 @@ void umain() {
     int count = 0;
     int arg = 0;
     pthread_t new;
-    r = pthread_create(&new,NULL, run,(void *) arg);
+
+    r = pthread_create(&new,NULL, run,(void *)(&arg));
     if (!r) {
         while (1) {
             if (count == 10) {
