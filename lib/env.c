@@ -613,142 +613,142 @@ env_run(struct Tcb *t)
 //	printf("after env_run\n");
 }
 
-void env_check()
-{
-    struct Env *temp, *pe, *pe0, *pe1, *pe2;
-    struct Env_list fl;
-    int re = 0;
-    /* should be able to allocate three envs */
-    pe0 = 0;
-    pe1 = 0;
-    pe2 = 0;
-    assert(env_alloc(&pe0, 0) == 0);
-    assert(env_alloc(&pe1, 0) == 0);
-    assert(env_alloc(&pe2, 0) == 0);
-    assert(pe0);
-    assert(pe1 && pe1 != pe0);
-    assert(pe2 && pe2 != pe1 && pe2 != pe0);
-    /* temporarily steal the rest of the free envs */
-    fl = env_free_list;
-    /* now this env_free list must be empty! */
-    LIST_INIT(&env_free_list);
-
-    /* should be no free memory */
-    assert(env_alloc(&pe, 0) == -E_NO_FREE_ENV);
-
-    /* recover env_free_list */
-    env_free_list = fl;
-
-    printf("pe0->env_id %d\n",pe0->env_id);
-    printf("pe1->env_id %d\n",pe1->env_id);
-    printf("pe2->env_id %d\n",pe2->env_id);
-
-    assert(pe0->env_id == 1024);
-    assert(pe1->env_id == 3073);
-    assert(pe2->env_id == 5122);
-    printf("env_init() work well!\n");
-
-    /* check envid2env work well */
-    pe2->env_status = ENV_FREE;
-    re = envid2env(pe2->env_id, &pe, 0);
-
-    assert(pe == 0 && re == -E_BAD_ENV);
-
-    pe2->env_status = ENV_RUNNABLE;
-    re = envid2env(pe2->env_id, &pe, 0);
-
-    assert(pe->env_id == pe2->env_id &&re == 0);
-
-    temp = curenv;
-    curenv = pe0;
-    re = envid2env(pe2->env_id, &pe, 1);
-    assert(pe == 0 && re == -E_BAD_ENV);
-    curenv = temp;
-    printf("envid2env() work well!\n");
-
-    /* check env_setup_vm() work well */
-    printf("pe1->env_pgdir %x\n",pe1->env_pgdir);
-    printf("pe1->env_cr3 %x\n",pe1->env_cr3);
-
-    assert(pe2->env_pgdir[PDX(UTOP)] == boot_pgdir[PDX(UTOP)]);
-    assert(pe2->env_pgdir[PDX(UTOP)-1] == 0);
-    printf("env_setup_vm passed!\n");
-
-    assert(pe2->env_tf.cp0_status == 0x10001004);
-    printf("pe2`s sp register %x\n",pe2->env_tf.regs[29]);
-
-    /* free all env allocated in this function */
-    LIST_INSERT_HEAD(env_sched_list, pe0, env_sched_link);
-    LIST_INSERT_HEAD(env_sched_list, pe1, env_sched_link);
-    LIST_INSERT_HEAD(env_sched_list, pe2, env_sched_link);
-
-    env_free(pe2);
-    env_free(pe1);
-    env_free(pe0);
-
-    printf("env_check() succeeded!\n");
-}
-
-void load_icode_check() {
-    /* check_icode.c from init/init.c */
-    extern u_char binary_user_check_icode_start[];
-    extern u_int binary_user_check_icode_size;
-    env_create(binary_user_check_icode_start, binary_user_check_icode_size);
-    struct Env* e;
-    Pte* pte;
-    u_int paddr;
-    assert(envid2env(1024, &e, 0) == 0);
-	int i;
-    /* text & data: 0x00401030 - 0x00409adc left closed and right open interval */
-    assert(pgdir_walk(e->env_pgdir, 0x00401000, 0, &pte) == 0);
-	for(i=800;i<1024;i++)
-	{
-		//printf("the content of pte+%d = 0x%x\n",i,*((int *)KADDR(PTE_ADDR(*pte)) + i));
-	}
-    assert(*((int *)KADDR(PTE_ADDR(*pte)) + 0xc) == 0x8fa40000);
-    assert(*((int *)KADDR(PTE_ADDR(*pte)) + 1023) == 0x26300001);
-    assert(pgdir_walk(e->env_pgdir, 0x00402000, 0, &pte) == 0);
-    //printf("*((int *)KADDR(PTE_ADDR(*pte))) =0x%x\n",*((int *)KADDR(PTE_ADDR(*pte))));
-	
-	for(i=1;i<400;i++)
-	{
-		//printf("the content of pte+%d = 0x%x\n",i,*((int *)KADDR(PTE_ADDR(*pte)) + i));
-	}
-    assert(*((int *)KADDR(PTE_ADDR(*pte))) == 0x10800004);
-    assert(*((int *)KADDR(PTE_ADDR(*pte)) + 1023) == 0x00801821);
-    assert(pgdir_walk(e->env_pgdir, 0x00403000, 0, &pte) == 0);
-    assert(*((int *)KADDR(PTE_ADDR(*pte))) == 0x80a20000);
-    assert(*((int *)KADDR(PTE_ADDR(*pte)) + 1023) == 0x24060604);
-    assert(pgdir_walk(e->env_pgdir, 0x00404000, 0, &pte) == 0);
-    assert(*((int *)KADDR(PTE_ADDR(*pte))) == 0x04400043);
-    assert(*((int *)KADDR(PTE_ADDR(*pte)) + 1023) == 0x00000000);
-    assert(pgdir_walk(e->env_pgdir, 0x00405000, 0, &pte) == 0);
-    assert(*((int *)KADDR(PTE_ADDR(*pte))) == 0x00000000);
-    assert(*((int *)KADDR(PTE_ADDR(*pte)) + 1023) == 0x00000000);
-    assert(pgdir_walk(e->env_pgdir, 0x00406000, 0, &pte) == 0);
-    assert(*((int *)KADDR(PTE_ADDR(*pte))) == 0x00000000);
-    assert(*((int *)KADDR(PTE_ADDR(*pte)) + 1023) == 0x00000000);
-    assert(pgdir_walk(e->env_pgdir, 0x00407000, 0, &pte) == 0);
-    assert(*((int *)KADDR(PTE_ADDR(*pte))) == 0x7f400000);
-    assert(*((int *)KADDR(PTE_ADDR(*pte)) + 1023) == 0x00000000);
-    assert(pgdir_walk(e->env_pgdir, 0x00408000, 0, &pte) == 0);
-    assert(*((int *)KADDR(PTE_ADDR(*pte))) == 0x0000fffe);
-    assert(*((int *)KADDR(PTE_ADDR(*pte)) + 1023) == 0x00000000);
-    assert(pgdir_walk(e->env_pgdir, 0x00409000, 0, &pte) == 0);
-    assert(*((int *)KADDR(PTE_ADDR(*pte))) == 0x00000000);
-    assert(*((int *)KADDR(PTE_ADDR(*pte)) + 0x2aa) == 0x004099fc);
-    printf("text & data segment load right!\n");
-    /* bss        : 0x00409adc - 0x0040aab4 left closed and right open interval */
-    assert(*((int *)KADDR(PTE_ADDR(*pte)) + 0x2b7) == 0x00000000);
-    assert(*((int *)KADDR(PTE_ADDR(*pte)) + 1023) == 0x00000000);
-    assert(pgdir_walk(e->env_pgdir, 0x0040a000, 0, &pte) == 0);
-    assert(*((int *)KADDR(PTE_ADDR(*pte))) == 0x00000000);
-    assert(*((int *)KADDR(PTE_ADDR(*pte)) + 0x2ac) == 0x00000000);
-    assert(*((int *)KADDR(PTE_ADDR(*pte)) + 0x2ad) == 0x00000000);
-    assert(*((int *)KADDR(PTE_ADDR(*pte)) + 1023) == 0x00000000);
-
-    printf("bss segment load right!\n");
-
-    env_free(e);
-    printf("load_icode_check() succeeded!\n");
-}
+//void env_check()
+//{
+//    struct Env *temp, *pe, *pe0, *pe1, *pe2;
+//    struct Env_list fl;
+//    int re = 0;
+//    /* should be able to allocate three envs */
+//    pe0 = 0;
+//    pe1 = 0;
+//    pe2 = 0;
+//    assert(env_alloc(&pe0, 0) == 0);
+//    assert(env_alloc(&pe1, 0) == 0);
+//    assert(env_alloc(&pe2, 0) == 0);
+//    assert(pe0);
+//    assert(pe1 && pe1 != pe0);
+//    assert(pe2 && pe2 != pe1 && pe2 != pe0);
+//    /* temporarily steal the rest of the free envs */
+//    fl = env_free_list;
+//    /* now this env_free list must be empty! */
+//    LIST_INIT(&env_free_list);
+//
+//    /* should be no free memory */
+//    assert(env_alloc(&pe, 0) == -E_NO_FREE_ENV);
+//
+//    /* recover env_free_list */
+//    env_free_list = fl;
+//
+//    printf("pe0->env_id %d\n",pe0->env_id);
+//    printf("pe1->env_id %d\n",pe1->env_id);
+//    printf("pe2->env_id %d\n",pe2->env_id);
+//
+//    assert(pe0->env_id == 1024);
+//    assert(pe1->env_id == 3073);
+//    assert(pe2->env_id == 5122);
+//    printf("env_init() work well!\n");
+//
+//    /* check envid2env work well */
+//    pe2->env_status = ENV_FREE;
+//    re = envid2env(pe2->env_id, &pe, 0);
+//
+//    assert(pe == 0 && re == -E_BAD_ENV);
+//
+//    pe2->env_status = ENV_RUNNABLE;
+//    re = envid2env(pe2->env_id, &pe, 0);
+//
+//    assert(pe->env_id == pe2->env_id &&re == 0);
+//
+//    temp = curenv;
+//    curenv = pe0;
+//    re = envid2env(pe2->env_id, &pe, 1);
+//    assert(pe == 0 && re == -E_BAD_ENV);
+//    curenv = temp;
+//    printf("envid2env() work well!\n");
+//
+//    /* check env_setup_vm() work well */
+//    printf("pe1->env_pgdir %x\n",pe1->env_pgdir);
+//    printf("pe1->env_cr3 %x\n",pe1->env_cr3);
+//
+//    assert(pe2->env_pgdir[PDX(UTOP)] == boot_pgdir[PDX(UTOP)]);
+//    assert(pe2->env_pgdir[PDX(UTOP)-1] == 0);
+//    printf("env_setup_vm passed!\n");
+//
+//    assert(pe2->env_tf.cp0_status == 0x10001004);
+//    printf("pe2`s sp register %x\n",pe2->env_tf.regs[29]);
+//
+//    /* free all env allocated in this function */
+//    LIST_INSERT_HEAD(env_sched_list, pe0, env_sched_link);
+//    LIST_INSERT_HEAD(env_sched_list, pe1, env_sched_link);
+//    LIST_INSERT_HEAD(env_sched_list, pe2, env_sched_link);
+//
+//    env_free(pe2);
+//    env_free(pe1);
+//    env_free(pe0);
+//
+//    printf("env_check() succeeded!\n");
+//}
+//
+//void load_icode_check() {
+//    /* check_icode.c from init/init.c */
+//    extern u_char binary_user_check_icode_start[];
+//    extern u_int binary_user_check_icode_size;
+//    env_create(binary_user_check_icode_start, binary_user_check_icode_size);
+//    struct Env* e;
+//    Pte* pte;
+//    u_int paddr;
+//    assert(envid2env(1024, &e, 0) == 0);
+//	int i;
+//    /* text & data: 0x00401030 - 0x00409adc left closed and right open interval */
+//    assert(pgdir_walk(e->env_pgdir, 0x00401000, 0, &pte) == 0);
+//	for(i=800;i<1024;i++)
+//	{
+//		//printf("the content of pte+%d = 0x%x\n",i,*((int *)KADDR(PTE_ADDR(*pte)) + i));
+//	}
+//    assert(*((int *)KADDR(PTE_ADDR(*pte)) + 0xc) == 0x8fa40000);
+//    assert(*((int *)KADDR(PTE_ADDR(*pte)) + 1023) == 0x26300001);
+//    assert(pgdir_walk(e->env_pgdir, 0x00402000, 0, &pte) == 0);
+//    //printf("*((int *)KADDR(PTE_ADDR(*pte))) =0x%x\n",*((int *)KADDR(PTE_ADDR(*pte))));
+//
+//	for(i=1;i<400;i++)
+//	{
+//		//printf("the content of pte+%d = 0x%x\n",i,*((int *)KADDR(PTE_ADDR(*pte)) + i));
+//	}
+//    assert(*((int *)KADDR(PTE_ADDR(*pte))) == 0x10800004);
+//    assert(*((int *)KADDR(PTE_ADDR(*pte)) + 1023) == 0x00801821);
+//    assert(pgdir_walk(e->env_pgdir, 0x00403000, 0, &pte) == 0);
+//    assert(*((int *)KADDR(PTE_ADDR(*pte))) == 0x80a20000);
+//    assert(*((int *)KADDR(PTE_ADDR(*pte)) + 1023) == 0x24060604);
+//    assert(pgdir_walk(e->env_pgdir, 0x00404000, 0, &pte) == 0);
+//    assert(*((int *)KADDR(PTE_ADDR(*pte))) == 0x04400043);
+//    assert(*((int *)KADDR(PTE_ADDR(*pte)) + 1023) == 0x00000000);
+//    assert(pgdir_walk(e->env_pgdir, 0x00405000, 0, &pte) == 0);
+//    assert(*((int *)KADDR(PTE_ADDR(*pte))) == 0x00000000);
+//    assert(*((int *)KADDR(PTE_ADDR(*pte)) + 1023) == 0x00000000);
+//    assert(pgdir_walk(e->env_pgdir, 0x00406000, 0, &pte) == 0);
+//    assert(*((int *)KADDR(PTE_ADDR(*pte))) == 0x00000000);
+//    assert(*((int *)KADDR(PTE_ADDR(*pte)) + 1023) == 0x00000000);
+//    assert(pgdir_walk(e->env_pgdir, 0x00407000, 0, &pte) == 0);
+//    assert(*((int *)KADDR(PTE_ADDR(*pte))) == 0x7f400000);
+//    assert(*((int *)KADDR(PTE_ADDR(*pte)) + 1023) == 0x00000000);
+//    assert(pgdir_walk(e->env_pgdir, 0x00408000, 0, &pte) == 0);
+//    assert(*((int *)KADDR(PTE_ADDR(*pte))) == 0x0000fffe);
+//    assert(*((int *)KADDR(PTE_ADDR(*pte)) + 1023) == 0x00000000);
+//    assert(pgdir_walk(e->env_pgdir, 0x00409000, 0, &pte) == 0);
+//    assert(*((int *)KADDR(PTE_ADDR(*pte))) == 0x00000000);
+//    assert(*((int *)KADDR(PTE_ADDR(*pte)) + 0x2aa) == 0x004099fc);
+//    printf("text & data segment load right!\n");
+//    /* bss        : 0x00409adc - 0x0040aab4 left closed and right open interval */
+//    assert(*((int *)KADDR(PTE_ADDR(*pte)) + 0x2b7) == 0x00000000);
+//    assert(*((int *)KADDR(PTE_ADDR(*pte)) + 1023) == 0x00000000);
+//    assert(pgdir_walk(e->env_pgdir, 0x0040a000, 0, &pte) == 0);
+//    assert(*((int *)KADDR(PTE_ADDR(*pte))) == 0x00000000);
+//    assert(*((int *)KADDR(PTE_ADDR(*pte)) + 0x2ac) == 0x00000000);
+//    assert(*((int *)KADDR(PTE_ADDR(*pte)) + 0x2ad) == 0x00000000);
+//    assert(*((int *)KADDR(PTE_ADDR(*pte)) + 1023) == 0x00000000);
+//
+//    printf("bss segment load right!\n");
+//
+//    env_free(e);
+//    printf("load_icode_check() succeeded!\n");
+//}
