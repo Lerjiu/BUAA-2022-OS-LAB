@@ -278,6 +278,7 @@ env_alloc(struct Env **new, u_int parent_id)
     /* Step 3: Initialize every field of new Env with appropriate values.*/
 	e->env_id = mkenvid(e);
     e->env_parent_id = parent_id;
+    printf("env id is 2'b%b\n",e->env_id);
 
     if ((r = thread_alloc(e,&t)) < 0) {
         return r;
