@@ -47,39 +47,70 @@ lp_Print(void (*output)(void *, char *, int),
     char *s;
     long int num;
 
-	
+    int longFlag;
+    int negFlag;
+    int width;
+    int prec;
+    int ladjust;
+    char padc;
 
-    int longFlag = 0;
-    int negFlag = 0;
-    int width = 0;
-    int prec = 0;
-    int ladjust = 0;
-    char padc = ' ';
+    int length;
 
-    int length = 0;
-
-    /*
-        Exercise 1.5. Please fill in two parts in this file.
-    */
-
-    for(;(*fmt);) {
-
-        /* Part1: your code here */
-	int buf_len = 0;
-	while((*fmt)!='%'&&(*fmt)!='\0')
+    for(;;) {
 	{ 
-	    /* scan for the next '%' */
+		s = buf;
+		while ((*fmt != '\0')&&(*fmt != '%')&&(s - buf < LP_MAX_BUF - 1))    
+		{
+			*s = *fmt;
+			s++;
+			fmt++;
+		}
+		*s = '\0';
+		if (s - buf > 0)
+			OUTPUT(arg, buf, s-buf);
+		if (*fmt == '\0') break;
+		if (*fmt != '%') continue;
+		fmt++;
 		
+		/* scan for the next '%' */
+
 	    /* flush the string found so far */
 
-	    /* check "are we hitting the end?" */
-		buf[buf_len++] = *fmt;
+	    /* are we hitting the end? */
+	}
+	ladjust = 0;
+	width = 0;
+	longFlag = 0;
+	prec = 0;
+	padc = ' ';
+	if (*fmt == '-') 
+	{
+		ladjust = 1; 
+		padc = ' '; 
+		fmt++; 
+	} else if (*fmt == '0')
+	{
+		ladjust = 0;
+		padc = '0';
 		fmt++;
 	}
-	buf[buf_len] = '\0';
-	if(buf_len != 0) {
-		OUTPUT(arg, buf, buf_len);
+	while (IsDigit(*fmt))
+	{
+		width = width*10 + *fmt - '0';
+		fmt++;
 	}
+	if (*fmt == '.') fmt++;
+	while (IsDigit(*fmt))
+	{
+		prec = prec*10 + *fmt - '0';
+		fmt++;
+	}
+	if (*fmt == 'l') 
+	{
+		fmt++;
+		longFlag = 1;
+	}
+
 	/* we found a '%' */
 	
 	/* check for long */
@@ -87,39 +118,6 @@ lp_Print(void (*output)(void *, char *, int),
 	/* check for other prefixes */
 
 	/* check format flag */
-	if((*fmt) == '%') {
-		fmt++;
-		if((*fmt) == '-') {
-			ladjust = 1;
-			padc = ' ';
-			fmt++;
-		} else if((*fmt) == '0') {
-			ladjust = 0;
-			fmt++;
-			padc = '0';
-		}
-		
-		width = 0;
-		while (IsDigit((*fmt))) {
-			width = width * 10 + Ctod((*fmt));
-			fmt++;
-		}
-		
-		prec = 0;
-		if((*fmt) == '.') {
-			fmt++;
-			while (IsDigit((*fmt))) {
-				prec = prec * 10 + Ctod((*fmt));
-				fmt++;
-			}
-		}
-		
-		if((*fmt) == 'l') {
-			longFlag  = 1;
-			fmt++;
-		}
-	}
-
 	negFlag = 0;
 	switch (*fmt) {
 	 case 'b':
@@ -139,19 +137,13 @@ lp_Print(void (*output)(void *, char *, int),
 	    } else { 
 		num = va_arg(ap, int); 
 	    }
-	    
-		/*  Part2:
-			your code here.
-			Refer to other part (case 'b',case 'o' etc.) and func PrintNum to complete this part.
-			Think the difference between case 'd' and others. (hint: negFlag).
-		*/
-		if(num < 0){
-			 num = ~num + 1;
-			negFlag = 1;
-		}
-		length = PrintNum(buf, num, 10, negFlag, width, ladjust, padc, 0);
+	    if (num < 0) {
+		num = - num;
+		negFlag = 1;
+	    }
+	    length = PrintNum(buf, num, 10, negFlag, width, ladjust, padc, 0);
 	    OUTPUT(arg, buf, length);
-		break;
+	    break;
 
 	 case 'o':
 	 case 'O':
