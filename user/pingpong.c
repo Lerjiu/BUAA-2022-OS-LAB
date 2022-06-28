@@ -34,7 +34,7 @@ umain(void)
 		ipc_send(who, i, 0, 0);
 
 		if (i == 10) {
-            writef("finish pingpong test");
+            writef("finish pingpong test\n");
 			return;
 		}
 		//writef("\n%x\n",i);
