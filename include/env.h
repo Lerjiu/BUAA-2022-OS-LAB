@@ -89,7 +89,7 @@ struct Env {
     u_int env_thread_count;
 
     // keep bytes
-    u_int env_nop[496];                  // align to avoid mul instruction
+    u_int env_nop[454];                  // align to avoid mul instruction
 
     // Lab 4 challenge
     struct Tcb env_threads[8];
