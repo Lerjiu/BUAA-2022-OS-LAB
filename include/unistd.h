@@ -2,10 +2,10 @@
 #define UNISTD_H
 
 #define __SYSCALL_BASE 9527
-#define __NR_SYSCALLS 20
+#define __NR_SYSCALLS 25
 
 
-#define SYS_putchar 		((__SYSCALL_BASE ) + (0 ) ) 
+#define SYS_putchar 		((__SYSCALL_BASE ) + (0 ) )
 #define SYS_getenvid 		((__SYSCALL_BASE ) + (1 ) )
 #define SYS_yield			((__SYSCALL_BASE ) + (2 ) )
 #define SYS_env_destroy		((__SYSCALL_BASE ) + (3 ) )
@@ -30,4 +30,5 @@
 #define SYS_sem_trywait		((__SYSCALL_BASE ) + (22 ))
 #define SYS_sem_post		((__SYSCALL_BASE ) + (23 ))
 #define SYS_sem_getvalue		((__SYSCALL_BASE ) + (24 ))
+
 #endif
