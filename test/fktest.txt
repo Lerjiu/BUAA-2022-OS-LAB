@@ -1,0 +1,72 @@
+//对原功能进行测试
+//课程组下发fktest.c的测试结果
+//this is father: a:1	this is child :a:2	this is child2 :a:3	交替出现，此为截取部分输出
+this is father: a:1
+
+this is father: a:1
+
+this is father: a:1
+
+this is father: a:1
+
+this is father: a:1
+
+this is father: a:1
+
+this is father: a:1
+
+this is father: a:1
+
+this is father: a:1
+
+this is father: a:1
+
+this is father: a:1
+
+this is father: a:a:2
+
+        this is child :a:2
+
+        this is child :a:2
+
+        this is child :a:2
+
+        this is child :a:2
+
+        this is child :a:2
+
+        this is child :a:2
+
+        this is child :a:2
+
+        this is child :a:2
+
+        this is child :a:2
+
+        this is child :a:2
+
+        this is child :a:2
+
+        this is child :a:2
+
+        this is child :a:2
+
+        this is child : :a:3
+
+                this is child2 :a:3
+
+                this is child2 :a:3
+
+                this is child2 :a:3
+
+                this is child2 :a:3
+
+                this is child2 :a:3
+
+                this is child2 :a:3
+
+                this is child2 :a:3
+
+                this is child2 :a:3
+
+                this is child2 :a:3
