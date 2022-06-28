@@ -148,7 +148,7 @@ env_init(void)
  *  and initialize the kernel portion of the new environment's address space.
  *  Do NOT map anything into the user portion of the environment's virtual address space.
  */
-/***Your Question Here***/
+
 static int
 env_setup_vm(struct Env *e)
 {
@@ -161,7 +161,7 @@ env_setup_vm(struct Env *e)
        * and add its reference.
        *pgdir is the page directory of Env e, assign value for it. */
 	r = page_alloc(&p);
-    	if (r < 0) {/* Todo here*/
+    	if (r < 0) {
                 panic("env_setup_vm - page alloc error\n");
                 return r;
         }
@@ -189,8 +189,6 @@ env_setup_vm(struct Env *e)
 	for (i = PDX(UTOP); i < 1024; i++) {
 		pgdir[i] = boot_pgdir[i];	
 	}
-
-
 
 
 
