@@ -15,7 +15,7 @@ void *run(void *arg) {
         count++;
         shared++;
         *((int*)arg) += 1;
-        writef("new thread:0x%x count:%d arg:%d shared:%d",tcb->thread_id, count, *((int*)arg), shared);
+        writef("new thread:0x%x count:%d arg:%d shared:%d",syscall_, count, *((int*)arg), shared);
     }
 }
 
