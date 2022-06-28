@@ -7,5 +7,5 @@
 void umain() {
 
     while(1)
-        writef("2");
+        writef("2 ");
 }
