@@ -10,7 +10,7 @@ void *run(void *arg) {
     writef("run a thread\n");
     while (1) {
         if (count == 20) {
-            writef("count is 20 and new thread break");
+            writef("count is 20 and new thread break\n");
             break;
         }
         count++;
@@ -32,7 +32,7 @@ void umain() {
     if (!r) {
         while (1) {
             if (count == 20) {
-                writef("count is 20 and umain thread break");
+                writef("count is 20 and umain thread break\n");
                 break;
             }
             count++;
