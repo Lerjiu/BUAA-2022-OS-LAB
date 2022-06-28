@@ -125,7 +125,7 @@ void env_destroy(struct Env *e);
 
 int envid2env(u_int envid, struct Env **penv, int checkperm);
 int threadid2tcb(u_int threadid, struct Tcb **ptcb);
-void env_run(struct Env *e);
+void env_run(struct Tcb *t);
 
 
 // for the grading script
