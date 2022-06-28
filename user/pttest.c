@@ -9,8 +9,8 @@ void *run(void *arg) {
     int count = 0;
     writef("run a thread\n");
     while (1) {
-        if (count == 100) {
-            writef("count is 100 and new thread break");
+        if (count == 20) {
+            writef("count is 20 and new thread break");
             break;
         }
         count++;
@@ -31,8 +31,8 @@ void umain() {
     r = pthread_create(&new,NULL, run,(void *)(&arg));
     if (!r) {
         while (1) {
-            if (count == 100) {
-                writef("count is 100 and umain thread break");
+            if (count == 20) {
+                writef("count is 20 and umain thread break");
                 break;
             }
             count++;
