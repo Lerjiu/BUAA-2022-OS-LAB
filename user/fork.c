@@ -162,6 +162,7 @@ fork(void)
 	if(newenvid == 0)
 	{
 		env = envs + ENVX(syscall_getenvid());
+        tcb = &env->env_threads[0];
 		return 0;
 	}
 	//The parent installs pgfault using set_pgfault_handler
