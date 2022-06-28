@@ -18,11 +18,11 @@ void mips_init() {
     env_init();
 
 //    ENV_CREATE(user_fktest);
-    ENV_CREATE(user_pingpong);
+//    ENV_CREATE(user_pingpong);
 //    ENV_CREATE_PRIORITY(user_a,1);
 //    ENV_CREATE_PRIORITY(user_b,2);
     //ENV_CREATE(user_helloworld);
-    //ENV_CREATE(user_pttest);
+    ENV_CREATE(user_pttest);
     //ENV_CREATE(user_ptstacktest);
     //ENV_CREATE(user_ptexittest);
     //ENV_CREATE(user_ptcanceltest);
