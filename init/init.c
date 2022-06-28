@@ -32,6 +32,8 @@ void mips_init() {
 
     trap_init();
     kclock_init();
+    while (1);
+    panic("init.c:\tend of mips_init() reached!");
 }
 
 void bcopy(const void *src, void *dst, size_t len) {
