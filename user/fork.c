@@ -78,7 +78,7 @@ void user_bzero(void *v, u_int n)
  * Otherwise, this handler should map a private writable copy of
  * the faulting page at correct address.
  */
-/*** exercise 4.13 ***/
+
 static void
 pgfault(u_int va)
 {
@@ -116,7 +116,7 @@ pgfault(u_int va)
  * A page with PTE_LIBRARY may have PTE_R at the same time. You
  * should process it correctly.
  */
-/*** exercise 4.10 ***/
+
 static void
 duppage(u_int envid, u_int pn)
 {
@@ -145,7 +145,7 @@ duppage(u_int envid, u_int pn)
  * Note: `set_pgfault_handler`(user/pgfault.c) is different from
  *       `syscall_set_pgfault_handler`.
  */
-/*** exercise 4.9 4.15***/
+
 extern void __asm_pgfault_handler(void);
 int
 fork(void)
