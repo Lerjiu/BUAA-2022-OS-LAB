@@ -12,7 +12,7 @@ void *run1(void *args) {
     for (a = 0; a < 2; ++a) {
         r = sem_wait(sem);
         if (r < 0) {
-            user_panic("fail P at son1: %d\n",r);
+            user_panic("fail P at thread2: %d\n",r);
         }
         writef("thread1 P! now a is %d\n",a + 1);
     }
@@ -26,7 +26,7 @@ void *run2(void *args) {
     for (b = 0; b < 3; ++b) {
         r = sem_wait(sem);
         if (r < 0) {
-            user_panic("fail P at son2: %d\n",r);
+            user_panic("fail P at thread2: %d\n",r);
         }
         writef("thread2 P! now b is %d\n",b + 1);
     }
@@ -67,7 +67,7 @@ void umain() {
     int i = 0;
     for (i = 0; i < 9; ++i) {
         if (value == 0) {
-            writef("father post the %d!\n", i+1);
+            writef("umain thread post the %d!\n", i+1);
             sem_post(&mysem);
         }
         syscall_yield();
