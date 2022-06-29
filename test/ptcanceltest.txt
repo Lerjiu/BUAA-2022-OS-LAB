@@ -1,0 +1,388 @@
+//测试pthread_cancel
+//umain线程先创建thread1，然后执行syscall_yield()，让出CPU，让thread1执行，然后执行pthread_cancel()，撤销thread1
+//然后umain线程创建thread2，再执行while (pthread_cancel(thread) < 0); 只要撤销结果返回失败，就不断循环，结果返回成功后，打印writef("umain notify thread2 to cancel!\n");
+//thread1调用pthread_setcancelstate()，设置为可撤销状态（默认不可撤销），然后循环20次，打印b的值，因为时间片的长度，没有全部打印完就会调度回umain线程，撤销thread1线程
+//thread2调用pthread_setcanceltype()，pthread_setcancelstate()，撤销类型为到取消点撤销（默认为立即撤销），撤销状态为可撤销
+//然后将100次循环打印b的值用pthread_testcancel()，前后包住。
+//一旦进入两个pthread_testcancel()之间，thread2不能被其他线程撤销（其实到取消点撤销的线程只能被pthread_testcancel()撤销，其他线程只能通过pthread_cancel()通知）
+//当前时间片足够thread2在一次调度中执行到打印b的值，在下一次调度umain时，通知thread2撤销，但只有在thread2中执行第二个pthread_testcancel()后，才能真正撤销
+//所以thread2将100次循环全部执行完毕
+//结果如下
+//测试另一种情况，即在第一个pthread_testcancel()执行前，umain线程便通知thread2撤销，在调度到thread2时，第一个pthread_testcancel()便会将thread2撤销，不会打印100次b的值
+//只需在第一个pthread_testcancel()之前多添加一些代码，在执行第一个pthread_testcancel()之前，调度回umain，通知thread2撤销
+//添加代码如下
+//    int c = 0;
+//    while (c < 20) {
+//        writef("thread2: c is %d\n", c);
+//    }
+//结果在分割线后
+umain thread
+
+thread id is 2'b100000000000001
+
+pageout:        @@@___0x7f3f9ff8___@@@  ins a page 
+
+thread 1
+
+thread1: old state is 0
+
+thread1: b is 1
+
+thread1: b is 2
+
+thread1: b is 3
+
+thread1: b is 4
+
+thread1: b is 5
+
+thread1: b is 6
+
+thread1: b is 7
+
+thread1: b is 8
+
+thread1: b is 9
+
+thread1: b is 10
+
+thread1: b is 11
+
+thread1: b is 12
+
+thread1: b is 1[00000800] destroying tcb 00004001
+
+[00000800] free tcb 00004001
+
+thread id is 2'b100000000000001
+
+thread 2
+
+thread2: old type is 0
+
+thread2: old state is 0
+
+thread2: b is 1
+
+thread2: b is 2
+
+thread2: bumain notify thread2 to cancel!
+
+[00000800] destroying tcb 00004000
+
+[00000800] free tcb 00004000
+
+i am thread, i am killed 0x4000 
+
+ is 3
+
+thread2: b is 4
+
+thread2: b is 5
+
+thread2: b is 6
+
+thread2: b is 7
+
+thread2: b is 8
+
+thread2: b is 9
+
+thread2: b is 10
+
+thread2: b is 11
+
+thread2: b is 12
+
+thread2: b is 13
+
+thread2: b is 14
+
+thread2: b is 15
+
+thread2: b is 16
+
+thread2: b is 17
+
+thread2: b is 18
+
+thread2: b is 19
+
+thread2: b is 20
+
+thread2: b is 21
+
+thread2: b is 22
+
+thread2: b is 23
+
+thread2: b is 24
+
+thread2: b is 25
+
+thread2: b is 26
+
+thread2: b is 27
+
+thread2: b is 28
+
+thread2: b is 29
+
+thread2: b is 30
+
+thread2: b is 31
+
+thread2: b is 32
+
+thread2: b is 33
+
+thread2: b is 34
+
+thread2: b is 35
+
+thread2: b is 36
+
+thread2: b is 37
+
+thread2: b is 38
+
+thread2: b is 39
+
+thread2: b is 40
+
+thread2: b is 41
+
+thread2: b is 42
+
+thread2: b is 43
+
+thread2: b is 44
+
+thread2: b is 45
+
+thread2: b is 46
+
+thread2: b is 47
+
+thread2: b is 48
+
+thread2: b is 49
+
+thread2: b is 50
+
+thread2: b is 51
+
+thread2: b is 52
+
+thread2: b is 53
+
+thread2: b is 54
+
+thread2: b is 55
+
+thread2: b is 56
+
+thread2: b is 57
+
+thread2: b is 58
+
+thread2: b is 59
+
+thread2: b is 60
+
+thread2: b is 61
+
+thread2: b is 62
+
+thread2: b is 63
+
+thread2: b is 64
+
+thread2: b is 65
+
+thread2: b is 66
+
+thread2: b is 67
+
+thread2: b is 68
+
+thread2: b is 69
+
+thread2: b is 70
+
+thread2: b is 71
+
+thread2: b is 72
+
+thread2: b is 73
+
+thread2: b is 74
+
+thread2: b is 75
+
+thread2: b is 76
+
+thread2: b is 77
+
+thread2: b is 78
+
+thread2: b is 79
+
+thread2: b is 80
+
+thread2: b is 81
+
+thread2: b is 82
+
+thread2: b is 83
+
+thread2: b is 84
+
+thread2: b is 85
+
+thread2: b is 86
+
+thread2: b is 87
+
+thread2: b is 88
+
+thread2: b is 89
+
+thread2: b is 90
+
+thread2: b is 91
+
+thread2: b is 92
+
+thread2: b is 93
+
+thread2: b is 94
+
+thread2: b is 95
+
+thread2: b is 96
+
+thread2: b is 97
+
+thread2: b is 98
+
+thread2: b is 99
+
+thread2: b is 100
+
+[00000800] destroying tcb 00004001
+
+[00000800] free tcb 00004001
+
+[00000800] free env 00000800
+
+i am thread, i am killed 0x4001 
+
+---------------------------------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------------------------------
+
+umain thread
+
+thread id is 2'b100000000000001
+
+pageout:        @@@___0x7f3f9ff8___@@@  ins a page 
+
+thread 1
+
+thread1: old state is 0
+
+thread1: b is 1
+
+thread1: b is 2
+
+thread1: b is 3
+
+thread1: b is 4
+
+thread1: b is 5
+
+thread1: b is 6
+
+thread1: b is 7
+
+thread1: b is 8
+
+thread1: b is 9
+
+thread1: b is 10
+
+thread1: b is 11
+
+thread1: b is 12
+
+thread1: b is 1[00000800] destroying tcb 00004001
+
+[00000800] free tcb 00004001
+
+thread id is 2'b100000000000001
+
+thread 2
+
+thread2: old type is 0
+
+thread2: old state is 0
+
+thread2: c is 1
+
+thread2: c is 2
+
+thread2: c umain notify thread2 to cancel!
+
+[00000800] destroying tcb 00004000
+
+[00000800] free tcb 00004000
+
+i am thread, i am killed 0x4000 
+
+is 3
+
+thread2: c is 4
+
+thread2: c is 5
+
+thread2: c is 6
+
+thread2: c is 7
+
+thread2: c is 8
+
+thread2: c is 9
+
+thread2: c is 10
+
+thread2: c is 11
+
+thread2: c is 12
+
+thread2: c is 13
+
+thread2: c is 14
+
+thread2: c is 15
+
+thread2: c is 16
+
+thread2: c is 17
+
+thread2: c is 18
+
+thread2: c is 19
+
+thread2: c is 20
+
+[00000800] destroying tcb 00004001
+
+[00000800] free tcb 00004001
+
+[00000800] free env 00000800
+
+i am thread, i am killed 0x4001 
+
