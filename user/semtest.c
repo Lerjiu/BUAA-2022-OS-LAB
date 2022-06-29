@@ -5,6 +5,7 @@
 #include "lib.h"
 
 void *run1(void *args) {
+    writef("thread1\n");
     sem_t *sem = (sem_t *)((u_int *)args)[0];
     int a;
     int r;
@@ -18,6 +19,7 @@ void *run1(void *args) {
 }
 
 void *run2(void *args) {
+    writef("thread2\n");
     sem_t *sem = (sem_t *)((u_int *)args)[0];
     int b;
     int r;
@@ -31,6 +33,7 @@ void *run2(void *args) {
 }
 
 void *run3(void *args) {
+    writef("thread3\n");
     sem_t *sem = (sem_t *)((u_int *)args)[0];
     int c;
     int r;
@@ -44,6 +47,7 @@ void *run3(void *args) {
 }
 
 void umain() {
+    writef("umain thread\n");
     u_int a[1];
     pthread_t thread1;
     pthread_t thread2;
