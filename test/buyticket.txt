@@ -1,0 +1,237 @@
+//通过买票行为，对信号量进行更直观的测试
+//umain创建三个线程、一个信号量、一个票数变量，用信号量来互斥访问票数变量
+//其中thread1、thread2的行为相同，P操作时阻塞，若成功买票，循环等待一段时间，再进行下一次买票
+//thread3的P操作不阻塞
+//通过调整thread1、thread2的等待时间，可以观察到不同结果
+//当循环次数为10000，thread1、thread2均在此处消耗大量时间，调度到thread3时可以拿到锁，开始卖票
+//此时thread3买票较多
+//通过信号量的设置，也实现了防止票超卖
+//结果如下
+//另一种结果，将循环次数设置较小（10），thread3甚至只能在开始时买到一张票（thread3最后创建，但是最先调度），结果在分割线后
+umain thread
+
+thread id is 2'b100000000000001
+
+thread id is 2'b100000000000010
+
+thread id is 2'b100000000000011
+
+[00000800] destroying tcb 00004000
+
+[00000800] free tcb 00004000
+
+i am thread, i am killed 0x4000 
+
+pageout:        @@@___0x7f3f1ff4___@@@  ins a page 
+
+thread3
+
+thread3 buy ticket 30, now have 2pageout:       @@@___0x7f3f5ff4___@@@  ins a page 
+
+thread2
+
+pageout:        @@@___0x7f3f9ff4___@@@  ins a page 
+
+thread1
+
+9 tickets
+
+thread2 buy ticket 29, now have 28 tickets
+
+thread1 buy ticket 28, now have 27 tickets
+
+thread3 buy ticket 27, now have 26 tickets
+
+thread3 buy ticket 26, now have 25 tickets
+
+thread3 buy ticket 25, now have 24 tickets
+
+thread3 buy ticket 24, now have 23 tickets
+
+thread3 buy ticket 23, now have 22 tickets
+
+thread3 buy ticket 22, now have 21 tickets
+
+thread3 buy ticket 21, now have 20 tickets
+
+thread3 buy ticket 20, now have 19 tickets
+
+thread2 buy ticket 19, now have 18 tickets
+
+thread1 buy ticket 18, now have 17 tickets
+
+thread3 buy ticket 17, now have 16 tickets
+
+thread3 buy ticket 16, now have 15 tickets
+
+thread3 buy ticket 15, now have 14 tickets
+
+thread3 buy ticket 14, now have 13 tickets
+
+thread3 buy ticket 13, now have 12 tickets
+
+thread3 buy ticket 12, now have 11 tickets
+
+thread3 buy ticket 11, now have 10 tickets
+
+thread3 buy ticket 10, now have 9 tickets
+
+thread2 buy ticket 9, now have 8 tickets
+
+thread1 buy ticket 8, now have 7 tickets
+
+thread3 buy ticket 7, now have 6 tickets
+
+thread3 buy ticket 6, now have 5 tickets
+
+thread3 buy ticket 5, now have 4 tickets
+
+thread3 buy ticket 4, now have 3 tickets
+
+thread3 buy ticket 3, now have 2 tickets
+
+thread2 buy ticket 2, now have 1 tickets
+
+thread1 buy ticket 1, now have 0 tickets
+
+thread1 buy 4 tickets
+
+[00000800] destroying tcb 00004001
+
+[00000800] free tcb 00004001
+
+i am thread, i am killed 0x4001 
+
+thread3 buy 22 tickets
+
+[00000800] destroying tcb 00004003
+
+[00000800] free tcb 00004003
+
+i am thread, i am killed 0x4003 
+
+thread2 buy 4 tickets
+
+[00000800] destroying tcb 00004002
+
+[00000800] free tcb 00004002
+
+[00000800] free env 00000800
+
+i am thread, i am killed 0x4002 
+
+-------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------
+
+umain thread
+
+thread id is 2'b100000000000001
+
+thread id is 2'b100000000000010
+
+thread id is 2'b100000000000011
+
+[00000800] destroying tcb 00004000
+
+[00000800] free tcb 00004000
+
+i am thread, i am killed 0x4000 
+
+pageout:        @@@___0x7f3f1ff4___@@@  ins a page 
+
+thread3
+
+thread3 buy ticket 30, now have 2pageout:       @@@___0x7f3f5ff4___@@@  ins a page 
+
+thread2
+
+pageout:        @@@___0x7f3f9ff4___@@@  ins a page 
+
+thread1
+
+9 tickets
+
+thread2 buy ticket 29, now have 28 tickets
+
+thread1 buy ticket 28, now have 27 tickets
+
+thread2 buy ticket 27, now have 26 tickets
+
+thread1 buy ticket 26, now have 25 tickets
+
+thread2 buy ticket 25, now have 24 tickets
+
+thread1 buy ticket 24, now have 23 tickets
+
+thread2 buy ticket 23, now have 22 tickets
+
+thread1 buy ticket 22, now have 21 tickets
+
+thread2 buy ticket 21, now have 20 tickets
+
+thread1 buy ticket 20, now have 19 tickets
+
+thread2 buy ticket 19, now have 18 tickets
+
+thread1 buy ticket 18, now have 17 tickets
+
+thread2 buy ticket 17, now have 16 tickets
+
+thread1 buy ticket 16, now have 15 tickets
+
+thread2 buy ticket 15, now have 14 tickets
+
+thread1 buy ticket 14, now have 13 tickets
+
+thread2 buy ticket 13, now have 12 tickets
+
+thread1 buy ticket 12, now have 11 tickets
+
+thread2 buy ticket 11, now have 10 tickets
+
+thread1 buy ticket 10, now have 9 tickets
+
+thread2 buy ticket 9, now have 8 tickets
+
+thread1 buy ticket 8, now have 7 tickets
+
+thread2 buy ticket 7, now have 6 tickets
+
+thread1 buy ticket 6, now have 5 tickets
+
+thread2 buy ticket 5, now have 4 tickets
+
+thread1 buy ticket 4, now have 3 tickets
+
+thread2 buy ticket 3, now have 2 tickets
+
+thread1 buy ticket 2, now have 1 tickets
+
+thread2 buy ticket 1, now have 0 tickets
+
+thread2 buy 15 tickets
+
+[00000800] destroying tcb 00004002
+
+[00000800] free tcb 00004002
+
+i am thread, i am killed 0x4002 
+
+thread1 buy 14 tickets
+
+[00000800] destroying tcb 00004001
+
+[00000800] free tcb 00004001
+
+i am thread, i am killed 0x4001 
+
+thread3 buy 1 tickets
+
+[00000800] destroying tcb 00004003
+
+[00000800] free tcb 00004003
+
+[00000800] free env 00000800
+
+i am thread, i am killed 0x4003 
