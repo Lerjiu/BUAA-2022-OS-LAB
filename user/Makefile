@@ -20,7 +20,7 @@ USERLIB := printf.o \
 CFLAGS += -nostdlib -static
 
 all: tltest.x tltest.b \
-	fktest.x fktest.b pingpong.x pingpong.b idle.x a.x a.b b.x b.b pttest.x pttest.b ptexittest.x ptexittest.b ptjointest.x ptjointest.b ptcanceltest.x ptcanceltest.b semtest.x semtest.b\
+	fktest.x fktest.b pingpong.x pingpong.b idle.x a.x a.b b.x b.b pttest.x pttest.b ptexittest.x ptexittest.b ptjointest.x ptjointest.b ptcanceltest.x ptcanceltest.b semtest.x semtest.b buyticket.x buyticket.b\
 	$(USERLIB) entry.o syscall_wrap.o
 
 %.x: %.b.c

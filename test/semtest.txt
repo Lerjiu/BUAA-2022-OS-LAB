@@ -1,0 +1,77 @@
+//测试信号量的基础函数
+//umain创建三个线程，一个信号量
+//umain九次循环，如果发现信号量的值为0，就会为该信号量增加1，即执行一次sem_post()，因为初始化时信号量为1，如果在调度其他线程进行sem_wait()之前，进入循环，则会少进行一次sem_post()，最终信号量为9个
+//thread1、thread2、thread3各自需要2、3、5个资源，因此会有一个线程得不到资源，不能结束
+//结果如下，最终thread3只得到了4个资源，没有执行结束
+umain thread
+
+thread id is 2'b100000000000001
+
+thread id is 2'b100000000000010
+
+thread id is 2'b100000000000011
+
+pageout:        @@@___0x7f3f1ff4___@@@  ins a page 
+
+thread3
+
+thread3 P! now c is 1
+
+pageout:        @@@___0x7f3f5ff4___@@@  ins a page 
+
+thread2
+
+pageout:        @@@___0x7f3f9ff4___@@@  ins a page 
+
+thread1
+
+umain thread post the 2!
+
+umain thread post the 3!
+
+thread2 P! now b is 1
+
+thread3 P! now c is 2
+
+umain thread post the 4!
+
+umain thread post the 5!
+
+thread2 P! now b is 2
+
+thread1 P! now a is 1
+
+umain thread post the 6!
+
+umain thread post the 7!
+
+thread2 P! now b is 3
+
+[00000800] destroying tcb 00004002
+
+[00000800] free tcb 00004002
+
+i am thread, i am killed 0x4002 
+
+thread3 P! now c is 3
+
+umain thread post the 8!
+
+umain thread post the 9!
+
+thread3 P! now c is 4
+
+thread1 P! now a is 2
+
+[00000800] destroying tcb 00004001
+
+[00000800] free tcb 00004001
+
+i am thread, i am killed 0x4001 
+
+[00000800] destroying tcb 00004000
+
+[00000800] free tcb 00004000
+
+i am thread, i am killed 0x4000 
+

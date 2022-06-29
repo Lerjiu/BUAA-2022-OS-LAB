@@ -76,5 +76,4 @@ void umain() {
             user_panic("r is %d\n",r);
         }
     }
-
 }
