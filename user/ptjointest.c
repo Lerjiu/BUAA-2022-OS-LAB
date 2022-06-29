@@ -7,9 +7,14 @@
 void *run1(void *args) {
     u_int father_threadid = ((u_int *)args)[0];
     u_int *ret;
+    int b = 0;
     writef("thread1 begin\n");
     if (pthread_join(father_threadid,&ret) < 0) {
         writef("thread1 fail join!\n");
+        while (b < 10) {
+            b++;
+            writef("thread1: b is %d\n", b);
+        }
         pthread_exit(0);
     }
     writef("thread1: umain is end, ret is %d\n",*ret);
@@ -18,9 +23,14 @@ void *run1(void *args) {
 void *run2(void *args) {
     u_int father_threadid = ((u_int *)args)[0];
     u_int *ret;
+    int b = 0;
     writef("thread2 begin\n");
     if (pthread_join(father_threadid,&ret) < 0) {
         writef("thread2 fail join!\n");
+        while (b < 10) {
+            b++;
+            writef("thread2: b is %d\n", b);
+        }
         pthread_exit(0);
     }
 
@@ -30,9 +40,14 @@ void *run2(void *args) {
 void *run3(void *args) {
     u_int father_threadid = ((u_int *)args)[0];
     u_int *ret;
+    int b = 0;
     writef("threaad3 begin\n");
     if (pthread_join(father_threadid,&ret) < 0) {
         writef("thread3 fail join!\n");
+        while (b < 10) {
+            b++;
+            writef("thread3: b is %d\n", b);
+        }
         pthread_exit(0);
     }
     writef("thread3: umain is end, ret is %d\n",*ret);
