@@ -1,0 +1,197 @@
+//测试pthread_join
+//在umain线程中创建三个线程，thread1、thread2、thread3，然后while(b<10)循环10次，每次打印b的值后，进行syscall_yield()
+//在三个线程中，进行pthread_join()，然后打印threadx: umain is end, ret is %d
+//若join成功，umain线程进行syscall_yield()后，也只有umain可以调度，三个线程均会等待umain线程结束后，才继续执行
+//结果如下
+//再用此程序测试pthread_detach，在创建三个线程前加入一句pthread_detach(a[0]); join失败，三个线程不会等待，所有的线程按调度循环打印b的值，结果见分割线后
+umain thread: b is 1
+
+pageout:        @@@___0x7f3f1ff8___@@@  ins a page 
+
+threaad3 begin
+
+pageout:        @@@___0x7f3f5ff8___@@@  ins a page 
+
+thread2 begin
+
+pageout:        @@@___0x7f3f9ff8___@@@  ins a page 
+
+thread1 begin
+
+umain thread: b is 2
+
+umain thread: b is 3
+
+umain thread: b is 4
+
+umain thread: b is 5
+
+umain thread: b is 6
+
+umain thread: b is 7
+
+umain thread: b is 8
+
+umain thread: b is 9
+
+umain thread: b is 10
+
+[00000800] destroying tcb 00004000
+
+[00000800] free tcb 00004000
+
+i am thread, i am killed 0x4000 
+
+thread3: umain is end, ret is 0
+
+[00000800] destroying tcb 00004003
+
+[00000800] free tcb 00004003
+
+i am thread, i am killed 0x4003 
+
+thread2: umain is end, ret is 0
+
+[00000800] destroying tcb 00004002
+
+[00000800] free tcb 00004002
+
+i am thread, i am killed 0x4002 
+
+thread1: umain is end, ret is 0
+
+[00000800] destroying tcb 00004001
+
+[00000800] free tcb 00004001
+
+[00000800] free env 00000800
+
+i am thread, i am killed 0x4001 
+
+----------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------
+
+umain thread: b is 1
+
+pageout:        @@@___0x7f3f1ff8___@@@  ins a page 
+
+threaad3 begin
+
+thread3 fail join!
+
+thread3: b is 1
+
+thread3: b is 2
+
+thread3: b is 3
+
+thread3: b is 4
+
+thread3: b is 5
+
+thread3: b is 6
+
+thread3: b is 7
+
+thread3: b is 8
+
+thread3: b is 9
+
+thread3: b is 10
+
+[00000800] destroying tcb 00004003
+
+[00000800] free tcb 00004003
+
+i am thread, i am killed 0x4003 
+
+pageout:        @@@___0x7f3f5ff8___@@@  ins a page 
+
+thread2 begin
+
+thread2 fail join!
+
+thread2: b is 1
+
+thread2: b is 2
+
+thread2: b is 3
+
+thread2: b is 4
+
+thread2: b is 5
+
+thread2: b is 6
+
+thread2: b is 7
+
+pageout:        @@@___0x7f3f9ff8___@@@  ins a page 
+
+thread1 begin
+
+thread1 fail join!
+
+thread1: b is 1
+
+thread1: b is 2
+
+thread2: b is 8
+
+thread2: b is 9
+
+umain thread: b is 2
+
+umain thread: b is 3
+
+thread2: b is 10
+
+[00000800] destroying tcb 00004002
+
+[00000800] free tcb 00004002
+
+i am thread, i am killed 0x4002 
+
+thread1: b is 3
+
+thread1: b is 4
+
+thread1: b is 5
+
+umain thread: b is 4
+
+umain thread: b is 5
+
+thread1: b is 6
+
+thread1: b is 7
+
+thread1: b is 8
+
+thread1: b is 9
+
+thread1: b is 10
+
+[00000800] destroying tcb 00004001
+
+[00000800] free tcb 00004001
+
+i am thread, i am killed 0x4001 
+
+umain thread: b is 6
+
+umain thread: b is 7
+
+umain thread: b is 8
+
+umain thread: b is 9
+
+umain thread: b is 10
+
+[00000800] destroying tcb 00004000
+
+[00000800] free tcb 00004000
+
+[00000800] free env 00000800
+
+i am thread, i am killed 0x4000 

@@ -1,0 +1,63 @@
+//测试pthread_exit
+//将umain函数代表的线程称作umain线程，新创建的线程叫做new线程
+//umain线程创建new线程之后，while循环判断new线程对应tcb是否为free，若不为free则一直打印new thread's tcb is not free
+//若为free则，打印new thread退出结果
+//new thread先打印自己的id，然后进行pthread_exit()，在之后打印new thread not exit!，若打印出这句说明没有正常退出
+//执行结果如下
+umain thread
+
+thread id is 2'b100000000000001
+
+new thread's tcb is not free
+
+new thread's tcb is not free
+
+new thread's tcb is not free
+
+new thread's tcb is not free
+
+new thread's tcb is not free
+
+new thread's tcb is not free
+
+new thread's tcb is not free
+
+new thread's tcb is not free
+
+new thread's tcb is not free
+
+new thread's tcb is not free
+
+new thread's tcb is not free
+
+new thread's tcb is not free
+
+new thread's tcb is not free
+
+new thread's tcb is not free
+
+new thread's tcb is not free
+
+new thread's tcb is pageout:    @@@___0x7f3f9ff4___@@@  ins a page 
+
+run a thread
+
+new threadid is 0x4001
+
+[00000800] destroying tcb 00004001
+
+[00000800] free tcb 00004001
+
+i am thread, i am killed 0x4001 
+
+not free
+
+new thread exit ret is -2
+
+[00000800] destroying tcb 00004000
+
+[00000800] free tcb 00004000
+
+[00000800] free env 00000800
+
+i am thread, i am killed 0x4000 
