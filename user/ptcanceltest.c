@@ -37,12 +37,12 @@ void umain() {
     a[0] = 1;
 
     pthread_t thread;
-    if (pthread_create(&thread,NULL,test,(void *)a)) {
+    if (pthread_create(&thread,NULL,run1,(void *)a)) {
         user_panic("create thread fail!\n");
     }
     syscall_yield();
     pthread_cancel(thread);
-    if (pthread_create(&thread,NULL,test2,(void *)a)) {
+    if (pthread_create(&thread,NULL,run2,(void *)a)) {
         user_panic("create thread fail 2\n");
     }
     while (pthread_cancel(thread) < 0);
