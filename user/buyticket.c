@@ -9,6 +9,7 @@ void *buy(void *args) {
     int thread = (int)((u_int *)args)[2];
     writef("thread%d\n", thread);
     int c;
+    int count = 0;
     int exitflag = 0;
     while (1) {
         sem_wait(mutex);
@@ -16,6 +17,7 @@ void *buy(void *args) {
         if (*b > 0) {
             c = *b;
             *b = *b - 1;
+            count++;
             writef("thread%d buy ticket %d, now have %d tickets\n",thread,c,*b);
         }
         if (*b == 0) {
@@ -29,11 +31,12 @@ void *buy(void *args) {
             break;
         }
         int time = 0;
-        while (time < 10) {
+        while (time < 100) {
             time++;
 //            writef("thread%d wait for next buy %d ...\n", thread, time);
         }
     }
+    writef("thread%d buy %d tickets\n", thread, count);
     pthread_exit(0);
 }
 
@@ -43,12 +46,14 @@ void *buy2(void *args) {
     int thread = (int)((u_int *)args)[2];
     writef("thread%d\n", thread);
     int c;
+    int count = 0;
     int exitflag = 0;
     while (1) {
         if (sem_trywait(mutex) == 0) {
             if (*b > 0) {
                 c = *b;
                 *b = *b - 1;
+                count++;
                 writef("thread%d buy ticket %d, now have %d tickets\n",thread,c,*b);
             }
             if (*b == 0) {
@@ -64,6 +69,7 @@ void *buy2(void *args) {
             break;
         }
     }
+    writef("thread%d buy %d tickets\n", thread, count);
     pthread_exit(0);
 }
 void umain() {
