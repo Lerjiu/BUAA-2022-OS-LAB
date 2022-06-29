@@ -25,10 +25,10 @@ void *run2(void *arg) {
     writef("thread2: old type is %d\n", oldvalue);
     pthread_setcancelstate(THREAD_CAN_BE_CANCELED, &oldvalue);
     writef("thread2: old state is %d\n", oldvalue);
-//    int c = 0;
-//    while (c < 20) {
-//        writef("thread2: c is %d\n", c);
-//    }
+    int c = 0;
+    while (c < 20) {
+        writef("thread2: c is %d\n", c);
+    }
     pthread_testcancel();
     int b = 0;
     while (b < 100) {
