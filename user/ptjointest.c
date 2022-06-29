@@ -61,7 +61,7 @@ void umain() {
     pthread_t thread1;
     pthread_t thread2;
     pthread_t thread3;
-//    pthread_detach(a[0]);
+    pthread_detach(a[0]);
     pthread_create(&thread1,NULL,run1,(void *)a);
     pthread_create(&thread2,NULL,run2,(void *)a);
     pthread_create(&thread3,NULL,run3,(void *)a);
