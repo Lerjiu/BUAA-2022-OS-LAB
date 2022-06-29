@@ -6,7 +6,7 @@
 #include "../include/env.h"
 
 void *run1(void *arg) {
-    writef("thread 1\n")
+    writef("thread 1\n");
     int oldvalue;
     pthread_setcancelstate(THREAD_CAN_BE_CANCELED, &oldvalue);
     writef("thread1: old state is %d\n", oldvalue);
@@ -19,7 +19,7 @@ void *run1(void *arg) {
 }
 
 void *run2(void *arg) {
-    writef("thread 2\n")
+    writef("thread 2\n");
     int oldvalue;
     pthread_setcanceltype(THREAD_CANCEL_POINT, &oldvalue);
     writef("thread2: old type is %d\n", oldvalue);
@@ -44,7 +44,7 @@ void *run2(void *arg) {
 void umain() {
     int a[1];
     a[0] = 1;
-    writef("umain thread\n")
+    writef("umain thread\n");
     pthread_t thread;
     if (pthread_create(&thread,NULL,run1,(void *)a)) {
         user_panic("create thread fail!\n");
