@@ -1,0 +1,116 @@
+//测试pthread_create以及线程之间共享资源，独立栈空间
+//将umain函数代表的线程称作umain线程，新创建的线程叫做new线程
+//两个线程均跑20次循环，每次循环打印变量信息
+//shraed是全局变量，umain线程与new线程共享
+//count是局部变量，在栈中，互相独立，用来控制循环次数
+//arg是局部变量，创建new线程时将其地址作为参数传给new线程
+//二者在循环20次后先后结束
+//因为arg是umain中的局部变量，所以umain退出后，new thread再进行访问得到异常值
+//因为writef是用户函数，打印时会被中断，在一行中出现异常显示时，是由切换线程的打印造成的，经检查后符合预期
+//一次运行结果如下
+umain thread
+
+thread id is 2'b100000000000001
+
+umain thread:0x4000 count:1 arg:1 shared:1
+
+umain thread:0x4000 count:2 arg:2 shared:2
+
+umain thread:0x4000 count:3 arg:3 shared:3
+
+umain thread:0x4000 count:4 arg:4 shared:4
+
+umain thread:0x4000 count:5 arg:5 shared:5
+
+umain thread:0x4000 count:6 arg:6 shared:6
+
+umain thread:0x4000 count:7 arg:7 shared:7
+
+umain thread:0x4000 count:8 arg:8 shared:8
+
+umain thread:0x4000 count:9 arg:9 shared:9
+
+umain thread:0x4000 count:10 arg:10 sharedpageout:      @@@___0x7f3f9ff8___@@@  ins a page 
+
+run a thread
+
+new thread:0x4001 count:1 arg:11 shared:11
+
+new thread:0x4001 count:2 arg:12 shared:12
+
+new thread:0x4001 count:3 arg:13 share:10
+
+umain thread:0x4000 count:11 arg:14 shared:14
+
+umain thread:0xd:13
+
+new thread:0x4001 count:4 arg:16 shared:16
+
+new thread:0x4001 count:5 arg:17 shared:17
+
+new thread:0x4001 count:6 arg:18 shared:18
+
+4000 count:12 arg:15 shared:15
+
+umain thread:0x4000 count:13 arg:19 shared:19
+
+umain thread:0x4000 count:14 arg:20 shared:20
+
+umain thread:0x4000 count:15 arg:21 shared:21
+
+umain thread:0x4000 count:16 arg:22 sharnew thread:0x4001 count:7 arg:23 shared:23
+
+new thread:0x4001 count:8 arg:24 shared:24
+
+new thread:0x4001 count:9 arg:25 shared:25
+
+new thread:0x4001 count:10 arg:26 shared:26
+
+new thread:0x4001 count:11 arg:27 shared:27
+
+new thread:0x4001 count:1ed:22
+
+umain thread:0x4000 count:17 arg:29 shared:29
+
+umain thread:0x4000 count:18 arg:30 shared:30
+
+umain thread:0x4000 count:19 arg:31 sh2 arg:28 shared:28
+
+new thread:0x4001 count:13 arg:32 shared:32
+
+new thread:0x4001 count:14 arg:33 shared:33
+
+new thread:0x4001 count:15 arared:31
+
+umain thread:0x4000 count:20 arg:35 shared:35
+
+count is 20 and umain thread break
+
+[00000800] destroying tcb 00004000
+
+[00000800] free tcb 00004000
+
+i am thread, i am killed 0x4000 
+
+g:34 shared:34
+
+new thread:0x4001 count:16 arg:4197605 shared:36
+
+new thread:0x4001 count:17 arg:4197606 shared:37
+
+new thread:0x4001 count:18 arg:4197607 shared:38
+
+new thread:0x4001 count:19 arg:4197608 shared:39
+
+new thread:0x4001 count:20 arg:4197609 shared:40
+
+count is 20 and new thread break
+
+[00000800] destroying tcb 00004001
+
+[00000800] free tcb 00004001
+
+[00000800] free env 00000800
+
+i am thread, i am killed 0x4001 
+
