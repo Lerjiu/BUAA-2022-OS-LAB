@@ -31,7 +31,7 @@ void *buy(void *args) {
         int time = 0;
         while (time < 10) {
             time++;
-            writef("thread%d wait for next buy %d ...\n", thread, time);
+//            writef("thread%d wait for next buy %d ...\n", thread, time);
         }
     }
     pthread_exit(0);
@@ -57,7 +57,7 @@ void *buy2(void *args) {
             }
             sem_post(mutex);
         } else {
-            writef("other thread buy, thread%d doesn't wait\n", thread);
+//            writef("other thread buy, thread%d doesn't wait\n", thread);
         }
         if (exitflag) {
             break;
