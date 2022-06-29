@@ -27,6 +27,7 @@ void *run2(void *arg) {
     writef("thread2: old state is %d\n", oldvalue);
     int c = 0;
     while (c < 20) {
+        c++;
         writef("thread2: c is %d\n", c);
     }
     pthread_testcancel();
