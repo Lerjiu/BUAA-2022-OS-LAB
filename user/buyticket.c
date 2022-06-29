@@ -31,7 +31,7 @@ void *buy(void *args) {
             break;
         }
         int time = 0;
-        while (time < 10000) {
+        while (time < 10) {
             time++;
 //            writef("thread%d wait for next buy %d ...\n", thread, time);
         }
