@@ -75,7 +75,7 @@ void umain() {
     arg1[0] = &mutex;
     arg2[0] = &mutex;
     arg3[0] = &mutex;
-    int sum = 100;
+    int sum = 30;
     arg1[1] = &sum;
     arg2[1] = &sum;
     arg3[1] = &sum;
