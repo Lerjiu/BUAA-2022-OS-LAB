@@ -41,6 +41,7 @@ void *buy2(void *args) {
     sem_t *mutex = (sem_t *)((u_int *)args)[0];
     int *b = (int *)((u_int *)args)[1];
     int thread = (int)((u_int *)args)[2];
+    writef("thread%d\n", thread);
     int c;
     int exitflag = 0;
     while (1) {
