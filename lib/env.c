@@ -286,7 +286,7 @@ env_alloc(struct Env **new, u_int parent_id)
 
     /*Step 4: focus on initializing env_tf structure, located at this new Env. 
      * especially the sp register,CPU status. */
-	t->tcb_tf.cp0_status = 0x10001004;
+	t->tcb_tf.cp0_status = 0x1000100c;
 	t->tcb_tf.regs[29] = USTACKTOP;
     	//e->env_tf.cp0_status = 0x10001004;
 	//e->env_tf.regs[29] = USTACKTOP;
