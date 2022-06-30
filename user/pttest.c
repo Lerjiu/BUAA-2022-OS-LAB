@@ -17,7 +17,7 @@ void *test(void *arg) {
     ++b;
     writef("b is change\n");
     while (1) {
-        writef("");
+//        writef("");
         if (a != 1)
             break;
     }
