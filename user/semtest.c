@@ -72,6 +72,7 @@ void umain() {
         }
         syscall_yield();
         r = sem_getvalue(&mysem,&value);
+        writef("after post the %d, sem value is %d", i+1, value);
         if (r < 0) {
             user_panic("r is %d\n",r);
         }
