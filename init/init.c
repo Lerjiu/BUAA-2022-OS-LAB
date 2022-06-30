@@ -25,8 +25,8 @@ void mips_init() {
 //    ENV_CREATE(user_ptexittest);
 //    ENV_CREATE(user_ptcanceltest);
 //    ENV_CREATE(user_ptjointest);
-//    ENV_CREATE(user_semtest);
-    ENV_CREATE(user_buyticket);
+    ENV_CREATE(user_semtest);
+//    ENV_CREATE(user_buyticket);
 
     trap_init();
     kclock_init();
