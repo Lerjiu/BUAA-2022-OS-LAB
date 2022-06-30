@@ -75,6 +75,5 @@ void umain() {
         if (r < 0) {
             user_panic("r is %d\n",r);
         }
-        writef("after post the %d, sem value is %d\n", i+1, value);
     }
 }
