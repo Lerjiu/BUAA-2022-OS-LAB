@@ -3,48 +3,42 @@
 //
 
 #include "lib.h"
-int a;
-int b;
-void *test(void *arg) {
-    int arg1 = ((int *)arg)[0];
-    int arg2 = ((int *)arg)[1];
-    int arg3 = ((int *)arg)[2];
-    int c;
-    writef("arg 1 is %d\n",arg1);
-    writef("arg 2 is %d\n",arg2);
-    writef("arg 3 is %d\n",arg3);
-    writef("a is %d\n",a);
-    ++b;
-    writef("b is change\n");
+#include "../include/types.h"
+int shared = 0;
+void *run(void *arg) {
+    int count = 0;
+    writef("run a thread\n");
     while (1) {
-        writef("");
-        if (a != 1)
+        if (count == 20) {
+            writef("count is 20 and new thread break\n");
             break;
-    }
-    writef("a is %d\n",a);
-}
-void umain() {
-    a = 0;
-    b = 0;
-    int c;
-    ++a;
-    int thread;
-    int args[3];
-    args[0] = 1;
-    args[1] = 2;
-    args[2] = 3;
-    pthread_t son;
-    thread = pthread_create(&son,NULL,test,(void *) args);
-    writef("create successful\n");
-    if (!thread) {
-        while (1) {
-            writef("");
-            if (b != 0)
-                break;
         }
-        ++a;
-        writef("I am out\n");
+        count++;
+        shared++;
+        *((int*)arg) += 1;
+        writef("new thread:0x%x count:%d arg:%d shared:%d\n",syscall_getthreadid(), count, *((int*)arg), shared);
     }
 }
 
+void umain() {
+    int r;
+    writef("umain thread\n");
 
+    int count = 0;
+    int arg = 0;
+    pthread_t new;
+
+    r = pthread_create(&new,NULL, run,(void *)(&arg));
+    if (!r) {
+        while (1) {
+            if (count == 20) {
+                writef("count is 20 and umain thread break\n");
+                break;
+            }
+            count++;
+            shared++;
+            arg++;
+            writef("umain thread:0x%x count:%d arg:%d shared:%d\n", syscall_getthreadid(), count, arg, shared);
+        }
+    }
+}
